@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="oscuro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RepartoReal — Lo que realmente ganás</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+
+  [data-theme="oscuro"] {
+    --bg:#0D0D0D;--bg2:#1A1A1A;--bg3:#2A2A2A;--border:#333;
+    --texto:#F5F4F0;--suave:#888;--acento:#00E676;--acento-texto:#0D0D0D;
+    --rojo:#FF3D3D;--rojo-bg:rgba(255,61,61,0.08);--rojo-border:rgba(255,61,61,0.25);--rojo-texto:#ff9090;
+    --verde-bg:rgba(0,230,118,0.06);--verde-border:rgba(0,230,118,0.2);--verde-texto:#80ffbe;
+  }
+  [data-theme="calido"] {
+    --bg:#1C1510;--bg2:#261D16;--bg3:#352820;--border:#4a3828;
+    --texto:#F5EFE6;--suave:#9a8070;--acento:#FF8C42;--acento-texto:#1C1510;
+    --rojo:#FF3D3D;--rojo-bg:rgba(255,61,61,0.08);--rojo-border:rgba(255,61,61,0.25);--rojo-texto:#ff9090;
+    --verde-bg:rgba(255,140,66,0.06);--verde-border:rgba(255,140,66,0.2);--verde-texto:#ffcba0;
+  }
+  [data-theme="dia"] {
+    --bg:#F0EDE8;--bg2:#E4E0DA;--bg3:#D5D0C8;--border:#C8C2B8;
+    --texto:#1A1510;--suave:#7a7060;--acento:#1A7A45;--acento-texto:#F0EDE8;
+    --rojo:#CC2200;--rojo-bg:rgba(204,34,0,0.06);--rojo-border:rgba(204,34,0,0.2);--rojo-texto:#aa2200;
+    --verde-bg:rgba(26,122,69,0.06);--verde-border:rgba(26,122,69,0.2);--verde-texto:#1A5A35;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--texto);font-family:'Space Grotesk',sans-serif;min-height:100vh;padding:0 0 60px;transition:background .3s,color .3s;}
+  header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+  .logo{font-family:'Space Mono',monospace;font-size:20px;font-weight:700;letter-spacing:-1px;}
+  .logo span{color:var(--acento);}
+  .tagline{font-size:11px;color:var(--suave);margin-top:3px;}
+  .modos{display:flex;gap:6px;}
+  .modo-btn{width:32px;height:32px;border-radius:8px;border:2px solid transparent;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;background:var(--bg2);transition:border-color .2s;}
+  .modo-btn.activo{border-color:var(--acento);}
+  .container{max-width:480px;margin:0 auto;padding:0 20px;}
+  .hero{padding:28px 0 18px;text-align:center;}
+  .hero h1{font-size:25px;font-weight:700;line-height:1.2;letter-spacing:-.5px;}
+  .hero h1 em{font-style:normal;color:var(--acento);}
+  .hero p{font-size:13px;color:var(--suave);margin-top:8px;line-height:1.6;}
+  .card{background:var(--bg2);border-radius:16px;padding:20px;margin-bottom:12px;border:1px solid var(--border);}
+  .card-title{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--suave);margin-bottom:16px;}
+  .field{margin-bottom:14px;}
+  .field:last-child{margin-bottom:0;}
+  .field label{display:block;font-size:13px;font-weight:500;margin-bottom:5px;}
+  .field .hint{font-size:11px;color:var(--suave);margin-bottom:6px;display:block;}
+  .input-wrap{display:flex;align-items:center;background:var(--bg3);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:border-color .2s;}
+  .input-wrap:focus-within{border-color:var(--acento);}
+  .input-wrap .prefix{padding:0 12px;font-size:13px;color:var(--suave);font-family:'Space Mono',monospace;border-right:1px solid var(--border);height:46px;display:flex;align-items:center;}
+  .input-wrap input{background:transparent;border:none;outline:none;color:var(--texto);font-size:16px;font-family:'Space Mono',monospace;font-weight:700;padding:0 12px;height:46px;width:100%;}
+  .input-wrap .suffix{padding:0 12px;font-size:12px;color:var(--suave);white-space:nowrap;}
+  .pedidos-row{display:flex;gap:10px;align-items:center;}
+  .pedidos-row input{background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--texto);font-size:20px;font-family:'Space Mono',monospace;font-weight:700;padding:0 12px;height:46px;width:75px;text-align:center;outline:none;transition:border-color .2s;}
+  .pedidos-row input:focus{border-color:var(--acento);}
+  .pedidos-valor{font-size:13px;color:var(--suave);}
+  .pedidos-valor strong{color:var(--texto);font-family:'Space Mono',monospace;}
+  .btn-calcular{width:100%;background:var(--acento);color:var(--acento-texto);border:none;border-radius:12px;height:52px;font-size:16px;font-weight:700;font-family:'Space Grotesk',sans-serif;cursor:pointer;margin-top:6px;transition:opacity .2s,transform .1s;}
+  .btn-calcular:active{transform:scale(.98);opacity:.9;}
+  .resultado{display:none;margin-top:6px;}
+  .resultado.visible{display:block;}
+  .resultado-hero{background:var(--bg2);border-radius:16px;padding:24px;text-align:center;border:1px solid var(--border);margin-bottom:12px;position:relative;overflow:hidden;}
+  .resultado-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--acento);}
+  .resultado-hero.malo::before{background:var(--rojo);}
+  .resultado-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--suave);margin-bottom:10px;}
+  .resultado-numero{font-family:'Space Mono',monospace;font-size:48px;font-weight:700;line-height:1;color:var(--acento);}
+  .resultado-numero.malo{color:var(--rojo);}
+  .resultado-sublabel{font-size:13px;color:var(--suave);margin-top:7px;}
+  .resultado-sublabel strong{color:var(--texto);}
+  .desglose{background:var(--bg2);border-radius:16px;padding:18px 20px;border:1px solid var(--border);margin-bottom:12px;}
+  .desglose-titulo{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--suave);margin-bottom:12px;}
+  .linea{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);font-size:14px;}
+  .linea:last-child{border-bottom:none;}
+  .linea .concepto{color:var(--suave);}
+  .linea .monto{font-family:'Space Mono',monospace;font-weight:700;}
+  .linea .monto.positivo{color:var(--texto);}
+  .linea .monto.negativo{color:var(--rojo);}
+  .linea .monto.neto{color:var(--acento);}
+  .linea-total{display:flex;justify-content:space-between;align-items:center;padding:12px 0 0;font-size:15px;font-weight:600;}
+  .alerta{background:var(--rojo-bg);border:1px solid var(--rojo-border);border-radius:12px;padding:14px 16px;font-size:13px;line-height:1.6;color:var(--rojo-texto);margin-bottom:12px;}
+  .alerta strong{color:var(--rojo);}
+  .buena{background:var(--verde-bg);border:1px solid var(--verde-border);border-radius:12px;padding:14px 16px;font-size:13px;line-height:1.6;color:var(--verde-texto);margin-bottom:12px;}
+  .buena strong{color:var(--acento);}
+  .btn-reset{width:100%;background:transparent;color:var(--suave);border:1px solid var(--border);border-radius:12px;height:44px;font-size:14px;font-family:'Space Grotesk',sans-serif;cursor:pointer;transition:color .2s,border-color .2s;margin-bottom:12px;}
+  .btn-reset:hover{color:var(--texto);border-color:var(--texto);}
+
+  /* COMENTARIOS */
+  .comentarios-section{margin-top:8px;}
+  .stars-input{display:flex;gap:6px;margin-bottom:14px;flex-direction:row-reverse;justify-content:flex-end;}
+  .stars-input input{display:none;}
+  .stars-input label{font-size:28px;cursor:pointer;color:var(--border);transition:color .15s;}
+  .stars-input label:hover,.stars-input label:hover~label,.stars-input input:checked~label{color:#FFD700;}
+  .comment-box{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--texto);font-family:'Space Grotesk',sans-serif;font-size:14px;padding:12px;resize:none;outline:none;transition:border-color .2s;min-height:80px;}
+  .comment-box:focus{border-color:var(--acento);}
+  .btn-comentar{width:100%;background:var(--bg3);color:var(--acento);border:1px solid var(--acento);border-radius:10px;height:44px;font-size:14px;font-weight:600;font-family:'Space Grotesk',sans-serif;cursor:pointer;margin-top:10px;transition:background .2s;}
+  .btn-comentar:hover{background:var(--acento);color:var(--acento-texto);}
+  .comentario-item{background:var(--bg3);border-radius:12px;padding:14px 16px;margin-bottom:10px;border:1px solid var(--border);}
+  .comentario-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+  .comentario-stars{color:#FFD700;font-size:14px;letter-spacing:1px;}
+  .comentario-fecha{font-size:11px;color:var(--suave);}
+  .comentario-texto{font-size:13px;line-height:1.6;color:var(--texto);}
+  .no-comentarios{text-align:center;padding:20px;font-size:13px;color:var(--suave);}
+  .rating-resumen{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding:14px 16px;background:var(--bg3);border-radius:12px;border:1px solid var(--border);}
+  .rating-numero{font-family:'Space Mono',monospace;font-size:36px;font-weight:700;color:var(--acento);line-height:1;}
+  .rating-stars{color:#FFD700;font-size:18px;}
+  .rating-total{font-size:12px;color:var(--suave);margin-top:2px;}
+
+  footer{text-align:center;padding:28px 20px 0;font-size:12px;color:var(--border);}
+  footer span{color:var(--acento);}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="logo">Reparto<span>Real</span></div>
+    <div class="tagline">Lo que realmente ganás</div>
+  </div>
+  <div class="modos">
+    <button class="modo-btn activo" onclick="setTema('oscuro')" id="btn-oscuro" title="Oscuro">🌑</button>
+    <button class="modo-btn" onclick="setTema('calido')" id="btn-calido" title="Cálido">🔥</button>
+    <button class="modo-btn" onclick="setTema('dia')" id="btn-dia" title="Día">☀️</button>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="hero">
+    <h1>¿Cuánto ganaste <em>de verdad</em> hoy?</h1>
+    <p>Las apps te muestran lo bruto. Acá ves lo neto: después de nafta, desgaste y horas.</p>
+  </div>
+
+  <div id="formulario">
+    <div class="card">
+      <div class="card-title">Tu jornada</div>
+      <div class="field">
+        <label>¿Cuántos pedidos entregaste?</label>
+        <div class="pedidos-row">
+          <input type="number" id="pedidos" min="1" max="50" value="1" oninput="actualizarPedidos()">
+          <div class="pedidos-valor">× $5.000 = <strong id="total-bruto-label">$5.000</strong></div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Horas trabajadas</label>
+        <span class="hint">Desde que salís hasta que llegás a casa</span>
+        <div class="input-wrap">
+          <input type="number" id="horas" min="1" max="16" value="12">
+          <span class="suffix">horas</span>
+        </div>
+      </div>
+      <div class="field">
+        <label>Kilómetros recorridos</label>
+        <span class="hint">Si no sabés, poné 30km por hora de trabajo</span>
+        <div class="input-wrap">
+          <input type="number" id="km" min="1" max="200" value="21">
+          <span class="suffix">km</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Zanella Cecatto 150</div>
+      <div class="field">
+        <label>Precio de la nafta hoy</label>
+        <span class="hint">Super en CABA — revisá YPF o Shell</span>
+        <div class="input-wrap">
+          <span class="prefix">$</span>
+          <input type="number" id="nafta-precio" min="500" max="5000" value="1350">
+          <span class="suffix">por litro</span>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-calcular" onclick="calcular()">Calcular lo que realmente gané</button>
+  </div>
+
+  <div class="resultado" id="resultado">
+    <div class="resultado-hero" id="resultado-hero">
+      <div class="resultado-label">Ganancia real por hora</div>
+      <div class="resultado-numero" id="resultado-numero">$0</div>
+      <div class="resultado-sublabel">de <strong id="resultado-bruto">$0</strong> brutos → <strong id="resultado-neto">$0</strong> en el bolsillo</div>
+    </div>
+
+    <div class="desglose">
+      <div class="desglose-titulo">Desglose completo</div>
+      <div class="linea"><span class="concepto">Pedidos cobrados</span><span class="monto positivo" id="d-bruto">+$0</span></div>
+      <div class="linea"><span class="concepto">Nafta</span><span class="monto negativo" id="d-nafta">-$0</span></div>
+      <div class="linea"><span class="concepto">Desgaste moto</span><span class="monto negativo" id="d-desgaste">-$0</span></div>
+      <div class="linea-total"><span>Neto real</span><span class="monto neto" id="d-neto">$0</span></div>
+    </div>
+
+    <div id="mensaje-alerta"></div>
+    <button class="btn-reset" onclick="resetear()">Calcular otra jornada</button>
+
+    <!-- COMENTARIOS -->
+    <div class="card comentarios-section">
+      <div class="card-title">¿Qué te pareció?</div>
+
+      <div id="rating-resumen" style="display:none"></div>
+
+      <div class="field">
+        <label>Tu valoración</label>
+        <div class="stars-input">
+          <input type="radio" name="stars" id="s5" value="5"><label for="s5">★</label>
+          <input type="radio" name="stars" id="s4" value="4"><label for="s4">★</label>
+          <input type="radio" name="stars" id="s3" value="3"><label for="s3">★</label>
+          <input type="radio" name="stars" id="s2" value="2"><label for="s2">★</label>
+          <input type="radio" name="stars" id="s1" value="1"><label for="s1">★</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Tu comentario</label>
+        <textarea class="comment-box" id="comentario-texto" placeholder="¿Te sirvió? ¿Qué le agregarías?"></textarea>
+      </div>
+
+      <button class="btn-comentar" onclick="enviarComentario()">Publicar comentario</button>
+
+      <div id="lista-comentarios" style="margin-top:18px;"></div>
+    </div>
+
+  </div>
+
+</div>
+
+<footer>
+  <div class="container">Hecho para repartidores de CABA · <span>RepartoReal</span></div>
+</footer>
+
+<script>
+  const CONSUMO = 35;
+  const DESGASTE = 8;
+
+  function setTema(t) {
+    document.documentElement.setAttribute('data-theme', t);
+    document.querySelectorAll('.modo-btn').forEach(b => b.classList.remove('activo'));
+    document.getElementById('btn-' + t).classList.add('activo');
+    try { localStorage.setItem('tema', t); } catch(e){}
+  }
+
+  try { const t = localStorage.getItem('tema'); if(t) setTema(t); } catch(e){}
+
+  function actualizarPedidos() {
+    const p = parseInt(document.getElementById('pedidos').value) || 1;
+    document.getElementById('total-bruto-label').textContent = '$' + (p * 5000).toLocaleString('es-AR');
+  }
+
+  function calcular() {
+    const pedidos = parseInt(document.getElementById('pedidos').value) || 1;
+    const horas = parseFloat(document.getElementById('horas').value) || 12;
+    const km = parseFloat(document.getElementById('km').value) || 21;
+    const nafta = parseFloat(document.getElementById('nafta-precio').value) || 1350;
+
+    const bruto = pedidos * 5000;
+    const costoNafta = Math.round((km / CONSUMO) * nafta);
+    const costoDesgaste = Math.round(km * DESGASTE);
+    const neto = bruto - costoNafta - costoDesgaste;
+    const porHora = Math.round(neto / horas);
+
+    document.getElementById('resultado-numero').textContent = '$' + porHora.toLocaleString('es-AR');
+    document.getElementById('resultado-bruto').textContent = '$' + bruto.toLocaleString('es-AR');
+    document.getElementById('resultado-neto').textContent = '$' + neto.toLocaleString('es-AR');
+    document.getElementById('d-bruto').textContent = '+$' + bruto.toLocaleString('es-AR');
+    document.getElementById('d-nafta').textContent = '-$' + costoNafta.toLocaleString('es-AR');
+    document.getElementById('d-desgaste').textContent = '-$' + costoDesgaste.toLocaleString('es-AR');
+    document.getElementById('d-neto').textContent = '$' + neto.toLocaleString('es-AR');
+
+    const hero = document.getElementById('resultado-hero');
+    const num = document.getElementById('resultado-numero');
+    if (porHora < 1000) { hero.classList.add('malo'); num.classList.add('malo'); }
+    else { hero.classList.remove('malo'); num.classList.remove('malo'); }
+
+    let msg = '';
+    if (porHora < 800) msg = `<div class="alerta"><strong>Ojo.</strong> Menos de $800 la hora. Con desgaste y tiempo, no está cerrando. Revisá zona o cantidad de pedidos.</div>`;
+    else if (porHora < 1500) msg = `<div class="buena">Dentro de lo normal para CABA. <strong>Para mejorar:</strong> más pedidos por hora, menos km entre cada uno.</div>`;
+    else msg = `<div class="buena"><strong>Buena jornada.</strong> Por encima del promedio. Anotá zona y horario — repetilo.</div>`;
+    document.getElementById('mensaje-alerta').innerHTML = msg;
+
+    document.getElementById('formulario').style.display = 'none';
+    document.getElementById('resultado').classList.add('visible');
+    renderComentarios();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function resetear() {
+    document.getElementById('formulario').style.display = 'block';
+    document.getElementById('resultado').classList.remove('visible');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // COMENTARIOS
+  function getComentarios() {
+    try { return JSON.parse(localStorage.getItem('comentarios') || '[]'); } catch(e) { return []; }
+  }
+
+  function saveComentarios(arr) {
+    try { localStorage.setItem('comentarios', JSON.stringify(arr)); } catch(e){}
+  }
+
+  function enviarComentario() {
+    const texto = document.getElementById('comentario-texto').value.trim();
+    const estrellaEl = document.querySelector('input[name="stars"]:checked');
+    if (!texto) { alert('Escribí algo antes de publicar.'); return; }
+    if (!estrellaEl) { alert('Elegí una valoración con estrellas.'); return; }
+
+    const nuevo = {
+      texto,
+      estrellas: parseInt(estrellaEl.value),
+      fecha: new Date().toLocaleDateString('es-AR', { day:'2-digit', month:'2-digit', year:'numeric' })
+    };
+
+    const arr = getComentarios();
+    arr.unshift(nuevo);
+    saveComentarios(arr);
+
+    document.getElementById('comentario-texto').value = '';
+    document.querySelectorAll('input[name="stars"]').forEach(r => r.checked = false);
+    renderComentarios();
+  }
+
+  function renderComentarios() {
+    const arr = getComentarios();
+    const lista = document.getElementById('lista-comentarios');
+    const resumen = document.getElementById('rating-resumen');
+
+    if (arr.length === 0) {
+      lista.innerHTML = '<div class="no-comentarios">Todavía no hay comentarios. ¡Sé el primero!</div>';
+      resumen.style.display = 'none';
+      return;
+    }
+
+    const promedio = (arr.reduce((s, c) => s + c.estrellas, 0) / arr.length).toFixed(1);
+    const estrellas = '★'.repeat(Math.round(promedio)) + '☆'.repeat(5 - Math.round(promedio));
+    resumen.style.display = 'flex';
+    resumen.innerHTML = `
+      <div class="rating-numero">${promedio}</div>
+      <div>
+        <div class="rating-stars">${estrellas}</div>
+        <div class="rating-total">${arr.length} valoración${arr.length !== 1 ? 'es' : ''}</div>
+      </div>`;
+
+    lista.innerHTML = arr.map(c => `
+      <div class="comentario-item">
+        <div class="comentario-header">
+          <span class="comentario-stars">${'★'.repeat(c.estrellas)}${'☆'.repeat(5-c.estrellas)}</span>
+          <span class="comentario-fecha">${c.fecha}</span>
+        </div>
+        <div class="comentario-texto">${c.texto}</div>
+      </div>`).join('');
+  }
+</script>
+</body>
+</html>
