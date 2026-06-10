@@ -3,28 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RepartoReal — Lo que realmente ganás</title>
+<title>RepartoReal — La verdad de la milanesa</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
 
-  [data-theme="oscuro"] {
-    --bg:#0D0D0D;--bg2:#1A1A1A;--bg3:#2A2A2A;--border:#333;
-    --texto:#F5F4F0;--suave:#888;--acento:#00E676;--acento-texto:#0D0D0D;
-    --rojo:#FF3D3D;--rojo-bg:rgba(255,61,61,0.08);--rojo-border:rgba(255,61,61,0.25);--rojo-texto:#ff9090;
-    --verde-bg:rgba(0,230,118,0.06);--verde-border:rgba(0,230,118,0.2);--verde-texto:#80ffbe;
-  }
-  [data-theme="calido"] {
-    --bg:#1C1510;--bg2:#261D16;--bg3:#352820;--border:#4a3828;
-    --texto:#F5EFE6;--suave:#9a8070;--acento:#FF8C42;--acento-texto:#1C1510;
-    --rojo:#FF3D3D;--rojo-bg:rgba(255,61,61,0.08);--rojo-border:rgba(255,61,61,0.25);--rojo-texto:#ff9090;
-    --verde-bg:rgba(255,140,66,0.06);--verde-border:rgba(255,140,66,0.2);--verde-texto:#ffcba0;
-  }
-  [data-theme="dia"] {
-    --bg:#F0EDE8;--bg2:#E4E0DA;--bg3:#D5D0C8;--border:#C8C2B8;
-    --texto:#1A1510;--suave:#7a7060;--acento:#1A7A45;--acento-texto:#F0EDE8;
-    --rojo:#CC2200;--rojo-bg:rgba(204,34,0,0.06);--rojo-border:rgba(204,34,0,0.2);--rojo-texto:#aa2200;
-    --verde-bg:rgba(26,122,69,0.06);--verde-border:rgba(26,122,69,0.2);--verde-texto:#1A5A35;
-  }
+  [data-theme="oscuro"]{--bg:#0D0D0D;--bg2:#1A1A1A;--bg3:#2A2A2A;--border:#333;--texto:#F5F4F0;--suave:#888;--acento:#00E676;--acento-texto:#0D0D0D;--rojo:#FF3D3D;--rojo-bg:rgba(255,61,61,0.08);--rojo-border:rgba(255,61,61,0.25);--rojo-texto:#ff9090;--verde-bg:rgba(0,230,118,0.06);--verde-border:rgba(0,230,118,0.2);--verde-texto:#80ffbe;}
+  [data-theme="calido"]{--bg:#1C1510;--bg2:#261D16;--bg3:#352820;--border:#4a3828;--texto:#F5EFE6;--suave:#9a8070;--acento:#FF8C42;--acento-texto:#1C1510;--rojo:#FF3D3D;--rojo-bg:rgba(255,61,61,0.08);--rojo-border:rgba(255,61,61,0.25);--rojo-texto:#ff9090;--verde-bg:rgba(255,140,66,0.06);--verde-border:rgba(255,140,66,0.2);--verde-texto:#ffcba0;}
+  [data-theme="dia"]{--bg:#F0EDE8;--bg2:#E4E0DA;--bg3:#D5D0C8;--border:#C8C2B8;--texto:#1A1510;--suave:#7a7060;--acento:#1A7A45;--acento-texto:#F0EDE8;--rojo:#CC2200;--rojo-bg:rgba(204,34,0,0.06);--rojo-border:rgba(204,34,0,0.2);--rojo-texto:#aa2200;--verde-bg:rgba(26,122,69,0.06);--verde-border:rgba(26,122,69,0.2);--verde-texto:#1A5A35;}
 
   *{box-sizing:border-box;margin:0;padding:0;}
   body{background:var(--bg);color:var(--texto);font-family:'Space Grotesk',sans-serif;min-height:100vh;padding:0 0 60px;transition:background .3s,color .3s;}
@@ -40,6 +25,11 @@
   .hero h1{font-size:25px;font-weight:700;line-height:1.2;letter-spacing:-.5px;}
   .hero h1 em{font-style:normal;color:var(--acento);}
   .hero p{font-size:13px;color:var(--suave);margin-top:8px;line-height:1.6;}
+
+  /* CONTADOR */
+  .contador-dia{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 16px;margin-bottom:18px;font-size:13px;color:var(--suave);}
+  .contador-dia strong{color:var(--acento);font-family:'Space Mono',monospace;font-size:16px;}
+
   .card{background:var(--bg2);border-radius:16px;padding:20px;margin-bottom:12px;border:1px solid var(--border);}
   .card-title{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--suave);margin-bottom:16px;}
   .field{margin-bottom:14px;}
@@ -49,15 +39,28 @@
   .input-wrap{display:flex;align-items:center;background:var(--bg3);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:border-color .2s;}
   .input-wrap:focus-within{border-color:var(--acento);}
   .input-wrap .prefix{padding:0 12px;font-size:13px;color:var(--suave);font-family:'Space Mono',monospace;border-right:1px solid var(--border);height:46px;display:flex;align-items:center;}
-  .input-wrap input{background:transparent;border:none;outline:none;color:var(--texto);font-size:16px;font-family:'Space Mono',monospace;font-weight:700;padding:0 12px;height:46px;width:100%;}
+  .input-wrap input,.input-wrap select{background:transparent;border:none;outline:none;color:var(--texto);font-size:15px;font-family:'Space Mono',monospace;font-weight:700;padding:0 12px;height:46px;width:100%;}
+  .input-wrap select option{background:var(--bg3);}
   .input-wrap .suffix{padding:0 12px;font-size:12px;color:var(--suave);white-space:nowrap;}
-  .pedidos-row{display:flex;gap:10px;align-items:center;}
-  .pedidos-row input{background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--texto);font-size:20px;font-family:'Space Mono',monospace;font-weight:700;padding:0 12px;height:46px;width:75px;text-align:center;outline:none;transition:border-color .2s;}
-  .pedidos-row input:focus{border-color:var(--acento);}
-  .pedidos-valor{font-size:13px;color:var(--suave);}
-  .pedidos-valor strong{color:var(--texto);font-family:'Space Mono',monospace;}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+
+  /* TOGGLE */
+  .toggle-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;}
+  .toggle-label{font-size:13px;font-weight:500;}
+  .toggle-sub{font-size:11px;color:var(--suave);margin-top:2px;}
+  .toggle{position:relative;width:44px;height:24px;flex-shrink:0;}
+  .toggle input{opacity:0;width:0;height:0;}
+  .slider{position:absolute;inset:0;background:var(--bg3);border-radius:24px;cursor:pointer;transition:.3s;border:1px solid var(--border);}
+  .slider:before{content:'';position:absolute;width:18px;height:18px;left:3px;top:2px;background:var(--suave);border-radius:50%;transition:.3s;}
+  .toggle input:checked+.slider{background:var(--acento);}
+  .toggle input:checked+.slider:before{transform:translateX(20px);background:var(--acento-texto);}
+  .costos-fijos{display:none;padding-top:6px;}
+  .costos-fijos.visible{display:block;}
+
   .btn-calcular{width:100%;background:var(--acento);color:var(--acento-texto);border:none;border-radius:12px;height:52px;font-size:16px;font-weight:700;font-family:'Space Grotesk',sans-serif;cursor:pointer;margin-top:6px;transition:opacity .2s,transform .1s;}
   .btn-calcular:active{transform:scale(.98);opacity:.9;}
+
+  /* RESULTADO */
   .resultado{display:none;margin-top:6px;}
   .resultado.visible{display:block;}
   .resultado-hero{background:var(--bg2);border-radius:16px;padding:24px;text-align:center;border:1px solid var(--border);margin-bottom:12px;position:relative;overflow:hidden;}
@@ -68,6 +71,13 @@
   .resultado-numero.malo{color:var(--rojo);}
   .resultado-sublabel{font-size:13px;color:var(--suave);margin-top:7px;}
   .resultado-sublabel strong{color:var(--texto);}
+
+  /* COMPARATIVA ZONA */
+  .comparativa-zona{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:12px;font-size:13px;line-height:1.6;}
+  .comparativa-zona .zona-titulo{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--suave);margin-bottom:8px;}
+  .comparativa-zona .zona-numero{font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--acento);}
+  .comparativa-zona .zona-texto{color:var(--suave);font-size:12px;margin-top:4px;}
+
   .desglose{background:var(--bg2);border-radius:16px;padding:18px 20px;border:1px solid var(--border);margin-bottom:12px;}
   .desglose-titulo{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--suave);margin-bottom:12px;}
   .linea{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);font-size:14px;}
@@ -78,15 +88,33 @@
   .linea .monto.negativo{color:var(--rojo);}
   .linea .monto.neto{color:var(--acento);}
   .linea-total{display:flex;justify-content:space-between;align-items:center;padding:12px 0 0;font-size:15px;font-weight:600;}
+
   .alerta{background:var(--rojo-bg);border:1px solid var(--rojo-border);border-radius:12px;padding:14px 16px;font-size:13px;line-height:1.6;color:var(--rojo-texto);margin-bottom:12px;}
   .alerta strong{color:var(--rojo);}
   .buena{background:var(--verde-bg);border:1px solid var(--verde-border);border-radius:12px;padding:14px 16px;font-size:13px;line-height:1.6;color:var(--verde-texto);margin-bottom:12px;}
   .buena strong{color:var(--acento);}
-  .btn-reset{width:100%;background:transparent;color:var(--suave);border:1px solid var(--border);border-radius:12px;height:44px;font-size:14px;font-family:'Space Grotesk',sans-serif;cursor:pointer;transition:color .2s,border-color .2s;margin-bottom:12px;}
+
+  /* BOTONES ACCIÓN */
+  .btns-accion{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+  .btn-ws{background:#25D366;color:#fff;border:none;border-radius:10px;height:46px;font-size:13px;font-weight:700;font-family:'Space Grotesk',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity .2s;}
+  .btn-ws:hover{opacity:.85;}
+  .btn-reset{background:transparent;color:var(--suave);border:1px solid var(--border);border-radius:10px;height:46px;font-size:13px;font-family:'Space Grotesk',sans-serif;cursor:pointer;transition:color .2s,border-color .2s;}
   .btn-reset:hover{color:var(--texto);border-color:var(--texto);}
 
+  /* COMUNIDAD */
+  .comunidad-ok{color:var(--acento);font-size:13px;margin-top:10px;display:none;text-align:center;}
+  .btn-comunidad{width:100%;background:transparent;color:var(--acento);border:1px solid var(--acento);border-radius:10px;height:46px;font-size:14px;font-weight:600;font-family:'Space Grotesk',sans-serif;cursor:pointer;margin-top:10px;transition:background .2s;}
+  .btn-comunidad:hover{background:var(--acento);color:var(--acento-texto);}
+  .btn-comunidad:disabled{opacity:.4;cursor:not-allowed;}
+
+  /* DONACIÓN */
+  .donacion-btns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px;}
+  .btn-mp{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 6px;cursor:pointer;text-align:center;transition:border-color .2s;color:var(--texto);}
+  .btn-mp:hover{border-color:var(--acento);}
+  .btn-mp .mp-monto{font-family:'Space Mono',monospace;font-weight:700;font-size:15px;color:var(--acento);}
+  .btn-mp .mp-label{font-size:10px;color:var(--suave);margin-top:3px;line-height:1.3;}
+
   /* COMENTARIOS */
-  .comentarios-section{margin-top:8px;}
   .stars-input{display:flex;gap:6px;margin-bottom:14px;flex-direction:row-reverse;justify-content:flex-end;}
   .stars-input input{display:none;}
   .stars-input label{font-size:28px;cursor:pointer;color:var(--border);transition:color .15s;}
@@ -97,9 +125,9 @@
   .btn-comentar:hover{background:var(--acento);color:var(--acento-texto);}
   .comentario-item{background:var(--bg3);border-radius:12px;padding:14px 16px;margin-bottom:10px;border:1px solid var(--border);}
   .comentario-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
-  .comentario-stars{color:#FFD700;font-size:14px;letter-spacing:1px;}
+  .comentario-stars{color:#FFD700;font-size:14px;}
   .comentario-fecha{font-size:11px;color:var(--suave);}
-  .comentario-texto{font-size:13px;line-height:1.6;color:var(--texto);}
+  .comentario-texto{font-size:13px;line-height:1.6;}
   .no-comentarios{text-align:center;padding:20px;font-size:13px;color:var(--suave);}
   .rating-resumen{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding:14px 16px;background:var(--bg3);border-radius:12px;border:1px solid var(--border);}
   .rating-numero{font-family:'Space Mono',monospace;font-size:36px;font-weight:700;color:var(--acento);line-height:1;}
@@ -115,7 +143,7 @@
 <header>
   <div>
     <div class="logo">Reparto<span>Real</span></div>
-    <div class="tagline">Lo que realmente ganás</div>
+    <div class="tagline">La verdad de la milanesa</div>
   </div>
   <div class="modos">
     <button class="modo-btn activo" onclick="setTema('oscuro')" id="btn-oscuro" title="Oscuro">🌑</button>
@@ -125,49 +153,158 @@
 </header>
 
 <div class="container">
-
   <div class="hero">
     <h1>¿Cuánto ganaste <em>de verdad</em> hoy?</h1>
     <p>Las apps te muestran lo bruto. Acá ves lo neto: después de nafta, desgaste y horas.</p>
   </div>
 
+  <div class="contador-dia">
+    <span>🛵 Hoy calcularon su jornada</span>
+    <strong id="contador-num">—</strong>
+    <span>repartidores</span>
+  </div>
+
   <div id="formulario">
     <div class="card">
       <div class="card-title">Tu jornada</div>
+
       <div class="field">
-        <label>¿Cuántos pedidos entregaste?</label>
-        <div class="pedidos-row">
-          <input type="number" id="pedidos" min="1" max="50" value="1" oninput="actualizarPedidos()">
-          <div class="pedidos-valor">× $5.000 = <strong id="total-bruto-label">$5.000</strong></div>
+        <label>¿Cuánto ganaste hoy en la app?</label>
+        <div class="input-wrap">
+          <span class="prefix">$</span>
+          <input type="number" id="ganancia-bruta" placeholder="Ej: 45000" min="0">
         </div>
       </div>
-      <div class="field">
-        <label>Horas trabajadas</label>
-        <span class="hint">Desde que salís hasta que llegás a casa</span>
-        <div class="input-wrap">
-          <input type="number" id="horas" min="1" max="16" value="12">
-          <span class="suffix">horas</span>
+
+      <div class="row2">
+        <div class="field">
+          <label>Horas trabajadas</label>
+          <div class="input-wrap">
+            <input type="number" id="horas" placeholder="Ej: 8" min="0.5" step="0.5">
+            <span class="suffix">hs</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>Kilómetros</label>
+          <div class="input-wrap">
+            <input type="number" id="km" placeholder="Ej: 80" min="1">
+            <span class="suffix">km</span>
+          </div>
         </div>
       </div>
+
       <div class="field">
-        <label>Kilómetros recorridos</label>
-        <span class="hint">Si no sabés, poné 30km por hora de trabajo</span>
+        <label>Zona donde trabajaste</label>
         <div class="input-wrap">
-          <input type="number" id="km" min="1" max="200" value="21">
-          <span class="suffix">km</span>
+          <input type="text" id="zona" placeholder="Ej: Almagro">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Plataforma</label>
+        <div class="input-wrap">
+          <select id="plataforma">
+            <option value="">— Seleccioná —</option>
+            <option>Rappi</option>
+            <option>PedidosYa</option>
+            <option>Uber Eats</option>
+            <option>Glovo</option>
+            <option>Varias</option>
+            <option>Independiente</option>
+          </select>
         </div>
       </div>
     </div>
 
     <div class="card">
-      <div class="card-title">Zanella Cecatto 150</div>
+      <div class="card-title">Tu moto</div>
+
+      <div class="row2">
+        <div class="field">
+          <label>Cilindrada <span style="color:var(--acento)">*</span></label>
+          <div class="input-wrap">
+            <select id="cilindrada" onchange="autoConsumo()">
+              <option value="">— cc —</option>
+              <option value="50">50cc</option>
+              <option value="110">110cc</option>
+              <option value="125">125cc</option>
+              <option value="150" selected>150cc</option>
+              <option value="200">200cc</option>
+              <option value="250">250cc</option>
+              <option value="300">+250cc</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label>Marca <span style="color:var(--suave);font-size:10px">(opcional)</span></label>
+          <div class="input-wrap">
+            <select id="marca-moto">
+              <option value="">— Marca —</option>
+              <option>Zanella</option><option>Motomel</option><option>Corven</option>
+              <option>Honda</option><option>Yamaha</option><option>Bajaj</option>
+              <option>TVS</option><option>Keller</option><option>Gilera</option>
+              <option>Guerrero</option><option>Beta</option><option>Jialing</option>
+              <option>Mondial</option><option>Kawasaki</option><option>Suzuki</option>
+              <option>Aprilia</option><option>KTM</option><option>Royal Enfield</option>
+              <option>Benelli</option><option>Haojue</option><option>SYM</option>
+              <option>Lifan</option><option>Otra</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
       <div class="field">
-        <label>Precio de la nafta hoy</label>
-        <span class="hint">Super en CABA — revisá YPF o Shell</span>
+        <label>Precio nafta hoy</label>
         <div class="input-wrap">
           <span class="prefix">$</span>
-          <input type="number" id="nafta-precio" min="500" max="5000" value="1350">
-          <span class="suffix">por litro</span>
+          <input type="number" id="nafta-precio" placeholder="Ej: 1350" min="500">
+          <span class="suffix">/ litro</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Consumo estimado</label>
+        <span class="hint">Se precarga según cilindrada — podés ajustarlo</span>
+        <div class="input-wrap">
+          <input type="number" id="consumo" placeholder="35" min="10" max="80">
+          <span class="suffix">km/litro</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Datos móviles <span style="color:var(--suave);font-size:10px">(costo diario)</span></label>
+        <span class="hint">Dividí tu plan mensual por 30. Ej: $9000 ÷ 30 = $300</span>
+        <div class="input-wrap">
+          <span class="prefix">$</span>
+          <input type="number" id="datos-moviles" placeholder="Ej: 300" min="0">
+          <span class="suffix">/ día</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Costos fijos</div>
+
+      <div class="toggle-row">
+        <div>
+          <div class="toggle-label">¿Pagás Monotributo y/o Seguro?</div>
+          <div class="toggle-sub">Suma el costo fijo diario real</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="toggle-monotributo" onchange="toggleCostos()">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="costos-fijos" id="costos-fijos">
+        <div class="field">
+          <label>¿Cuánto pagás por mes entre los dos?</label>
+          <span class="hint">Monotributo + seguro. Se divide por 30 automáticamente.</span>
+          <div class="input-wrap">
+            <span class="prefix">$</span>
+            <input type="number" id="costo-mensual" placeholder="Ej: 60000" min="0">
+            <span class="suffix">/ mes</span>
+          </div>
         </div>
       </div>
     </div>
@@ -175,6 +312,7 @@
     <button class="btn-calcular" onclick="calcular()">Calcular lo que realmente gané</button>
   </div>
 
+  <!-- RESULTADO -->
   <div class="resultado" id="resultado">
     <div class="resultado-hero" id="resultado-hero">
       <div class="resultado-label">Ganancia real por hora</div>
@@ -182,23 +320,67 @@
       <div class="resultado-sublabel">de <strong id="resultado-bruto">$0</strong> brutos → <strong id="resultado-neto">$0</strong> en el bolsillo</div>
     </div>
 
+    <div id="comparativa-zona" class="comparativa-zona" style="display:none"></div>
+
     <div class="desglose">
       <div class="desglose-titulo">Desglose completo</div>
-      <div class="linea"><span class="concepto">Pedidos cobrados</span><span class="monto positivo" id="d-bruto">+$0</span></div>
+      <div class="linea"><span class="concepto">Lo que te pagó la app</span><span class="monto positivo" id="d-bruto">+$0</span></div>
       <div class="linea"><span class="concepto">Nafta</span><span class="monto negativo" id="d-nafta">-$0</span></div>
       <div class="linea"><span class="concepto">Desgaste moto</span><span class="monto negativo" id="d-desgaste">-$0</span></div>
+      <div class="linea" id="linea-datos" style="display:none"><span class="concepto">Datos móviles</span><span class="monto negativo" id="d-datos">-$0</span></div>
+      <div class="linea" id="linea-fijos" style="display:none"><span class="concepto">Monotributo/Seguro (día)</span><span class="monto negativo" id="d-fijos">-$0</span></div>
       <div class="linea-total"><span>Neto real</span><span class="monto neto" id="d-neto">$0</span></div>
     </div>
 
     <div id="mensaje-alerta"></div>
-    <button class="btn-reset" onclick="resetear()">Calcular otra jornada</button>
+
+    <div class="btns-accion">
+      <button class="btn-ws" onclick="compartirWS()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Compartir mi Verdad
+      </button>
+      <button class="btn-reset" onclick="resetear()">Nueva jornada</button>
+    </div>
+
+    <!-- COMUNIDAD -->
+    <div class="card">
+      <div class="card-title">🔔 Alertas de zona</div>
+      <p style="font-size:13px;color:var(--suave);margin-bottom:12px;line-height:1.6;">Dejá tu mail o teléfono y te avisamos cuando tu zona esté pagando bien. Gratis, sin spam.</p>
+      <div class="field">
+        <div class="input-wrap">
+          <input type="text" id="contacto" placeholder="Mail o número de WhatsApp" oninput="checkContacto()">
+        </div>
+      </div>
+      <button class="btn-comunidad" id="btn-grupo" disabled onclick="unirseGrupo()">
+        Sumarme al grupo de alertas 🚀
+      </button>
+      <div class="comunidad-ok" id="comunidad-ok">✅ ¡Anotado! Te avisamos cuando tu zona esté activa.</div>
+    </div>
+
+    <!-- DONACIÓN -->
+    <div class="card">
+      <div class="card-title">☕ Donación para el creador</div>
+      <p style="font-size:13px;color:var(--suave);margin-bottom:4px;line-height:1.6;">Si te sirvió, bancá el proyecto. Gratis siempre, pero el hosting no se paga solo.</p>
+      <div class="donacion-btns">
+        <button class="btn-mp" onclick="donar(500)">
+          <div class="mp-monto">$500</div>
+          <div class="mp-label">Para los criollitos 🧉</div>
+        </button>
+        <button class="btn-mp" onclick="donar(1500)">
+          <div class="mp-monto">$1.500</div>
+          <div class="mp-label">Un combo de bajón 🍔</div>
+        </button>
+        <button class="btn-mp" onclick="donar(3000)">
+          <div class="mp-monto">$3.000</div>
+          <div class="mp-label">Birra + propina 🍺</div>
+        </button>
+      </div>
+    </div>
 
     <!-- COMENTARIOS -->
-    <div class="card comentarios-section">
-      <div class="card-title">¿Qué te pareció?</div>
-
+    <div class="card">
+      <div class="card-title">⭐ ¿Qué te pareció?</div>
       <div id="rating-resumen" style="display:none"></div>
-
       <div class="field">
         <label>Tu valoración</label>
         <div class="stars-input">
@@ -209,146 +391,268 @@
           <input type="radio" name="stars" id="s1" value="1"><label for="s1">★</label>
         </div>
       </div>
-
       <div class="field">
-        <label>Tu comentario</label>
         <textarea class="comment-box" id="comentario-texto" placeholder="¿Te sirvió? ¿Qué le agregarías?"></textarea>
       </div>
-
       <button class="btn-comentar" onclick="enviarComentario()">Publicar comentario</button>
-
       <div id="lista-comentarios" style="margin-top:18px;"></div>
     </div>
 
   </div>
-
 </div>
 
 <footer>
-  <div class="container">Hecho para repartidores de CABA · <span>RepartoReal</span></div>
+  <div class="container">Hecho para repartidores de CABA · <span>RepartoReal</span> · 2026</div>
 </footer>
 
 <script>
-  const CONSUMO = 35;
-  const DESGASTE = 8;
+const SUPA_URL = "https://bmlfjyrvktalzgctopeq.supabase.co";
+const SUPA_KEY = "sb_publishable_WyFi5lvLux6NVl2l4mfKDA_Qxd02ISJ";
+const DESGASTE_KM = 8;
+const LINK_GRUPO = "LINK_GRUPO_AQUI"; // reemplazar cuando esté listo
 
-  function setTema(t) {
-    document.documentElement.setAttribute('data-theme', t);
-    document.querySelectorAll('.modo-btn').forEach(b => b.classList.remove('activo'));
-    document.getElementById('btn-' + t).classList.add('activo');
-    try { localStorage.setItem('tema', t); } catch(e){}
+// Temas
+function setTema(t) {
+  document.documentElement.setAttribute('data-theme', t);
+  document.querySelectorAll('.modo-btn').forEach(b => b.classList.remove('activo'));
+  document.getElementById('btn-' + t).classList.add('activo');
+  try { localStorage.setItem('tema', t); } catch(e){}
+}
+try { const t = localStorage.getItem('tema'); if(t) setTema(t); } catch(e){}
+
+// Consumo por cilindrada
+function autoConsumo() {
+  const mapa = {'50':55,'110':45,'125':42,'150':35,'200':28,'250':22,'300':18};
+  const cc = document.getElementById('cilindrada').value;
+  if (mapa[cc]) document.getElementById('consumo').value = mapa[cc];
+}
+
+// Toggle costos fijos
+function toggleCostos() {
+  const on = document.getElementById('toggle-monotributo').checked;
+  document.getElementById('costos-fijos').classList.toggle('visible', on);
+}
+
+// Habilitar botón comunidad
+function checkContacto() {
+  const val = document.getElementById('contacto').value.trim();
+  document.getElementById('btn-grupo').disabled = val.length < 5;
+}
+
+// Contador del día
+async function cargarContador() {
+  try {
+    const hoy = new Date().toISOString().split('T')[0];
+    const res = await fetch(`${SUPA_URL}/rest/v1/jornada?select=id&created_at=gte.${hoy}T00:00:00`, {
+      headers: { apikey: SUPA_KEY, Authorization: 'Bearer ' + SUPA_KEY }
+    });
+    const data = await res.json();
+    document.getElementById('contador-num').textContent = Array.isArray(data) ? data.length : '—';
+  } catch(e) {
+    document.getElementById('contador-num').textContent = '—';
+  }
+}
+cargarContador();
+
+// Comparativa por zona
+async function cargarComparativa(zona, miHora) {
+  if (!zona) return;
+  try {
+    const res = await fetch(
+      `${SUPA_URL}/rest/v1/jornada?select=ganancia_hora&zona=ilike.*${encodeURIComponent(zona)}*`,
+      { headers: { apikey: SUPA_KEY, Authorization: 'Bearer ' + SUPA_KEY } }
+    );
+    const data = await res.json();
+    if (!Array.isArray(data) || data.length < 2) return;
+    const promedio = Math.round(data.reduce((s,r) => s + (r.ganancia_hora||0), 0) / data.length);
+    const diff = miHora - promedio;
+    const signo = diff >= 0 ? '+' : '';
+    const el = document.getElementById('comparativa-zona');
+    el.style.display = 'block';
+    el.innerHTML = `
+      <div class="zona-titulo">📍 Promedio en ${zona} (${data.length} jornadas)</div>
+      <div class="zona-numero">$${promedio.toLocaleString('es-AR')}/hora</div>
+      <div class="zona-texto">Vos estás <strong style="color:${diff>=0?'var(--acento)':'var(--rojo)'}">${signo}$${Math.abs(diff).toLocaleString('es-AR')}</strong> ${diff>=0?'por encima':'por debajo'} del promedio de tu zona.</div>
+    `;
+  } catch(e){}
+}
+
+function fmt(n) { return '$' + Math.round(n).toLocaleString('es-AR'); }
+
+function calcular() {
+  const bruto = parseFloat(document.getElementById('ganancia-bruta').value) || 0;
+  const horas = parseFloat(document.getElementById('horas').value) || 0;
+  const km = parseFloat(document.getElementById('km').value) || 0;
+  const nafta = parseFloat(document.getElementById('nafta-precio').value) || 0;
+  const consumo = parseFloat(document.getElementById('consumo').value) || 35;
+  const datos = parseFloat(document.getElementById('datos-moviles').value) || 0;
+  const zona = document.getElementById('zona').value.trim();
+  const plataforma = document.getElementById('plataforma').value;
+  const marca = document.getElementById('marca-moto').value;
+  const cilindrada = document.getElementById('cilindrada').value;
+
+  if (!bruto || !horas || !km || !nafta) {
+    alert('Completá los campos obligatorios: ganancia, horas, kilómetros y precio de nafta.');
+    return;
   }
 
-  try { const t = localStorage.getItem('tema'); if(t) setTema(t); } catch(e){}
-
-  function actualizarPedidos() {
-    const p = parseInt(document.getElementById('pedidos').value) || 1;
-    document.getElementById('total-bruto-label').textContent = '$' + (p * 5000).toLocaleString('es-AR');
+  const costoNafta = Math.round((km / consumo) * nafta);
+  const costoDesgaste = Math.round(km * DESGASTE_KM);
+  let costoFijos = 0;
+  const toggleOn = document.getElementById('toggle-monotributo').checked;
+  if (toggleOn) {
+    const mensual = parseFloat(document.getElementById('costo-mensual').value) || 0;
+    costoFijos = Math.round(mensual / 30);
   }
+  const totalGastos = costoNafta + costoDesgaste + datos + costoFijos;
+  const neto = bruto - totalGastos;
+  const porHora = Math.round(neto / horas);
 
-  function calcular() {
-    const pedidos = parseInt(document.getElementById('pedidos').value) || 1;
-    const horas = parseFloat(document.getElementById('horas').value) || 12;
-    const km = parseFloat(document.getElementById('km').value) || 21;
-    const nafta = parseFloat(document.getElementById('nafta-precio').value) || 1350;
+  // Mostrar
+  document.getElementById('resultado-numero').textContent = fmt(porHora);
+  document.getElementById('resultado-bruto').textContent = fmt(bruto);
+  document.getElementById('resultado-neto').textContent = fmt(neto);
+  document.getElementById('d-bruto').textContent = '+' + fmt(bruto);
+  document.getElementById('d-nafta').textContent = '-' + fmt(costoNafta);
+  document.getElementById('d-desgaste').textContent = '-' + fmt(costoDesgaste);
 
-    const bruto = pedidos * 5000;
-    const costoNafta = Math.round((km / CONSUMO) * nafta);
-    const costoDesgaste = Math.round(km * DESGASTE);
-    const neto = bruto - costoNafta - costoDesgaste;
-    const porHora = Math.round(neto / horas);
-
-    document.getElementById('resultado-numero').textContent = '$' + porHora.toLocaleString('es-AR');
-    document.getElementById('resultado-bruto').textContent = '$' + bruto.toLocaleString('es-AR');
-    document.getElementById('resultado-neto').textContent = '$' + neto.toLocaleString('es-AR');
-    document.getElementById('d-bruto').textContent = '+$' + bruto.toLocaleString('es-AR');
-    document.getElementById('d-nafta').textContent = '-$' + costoNafta.toLocaleString('es-AR');
-    document.getElementById('d-desgaste').textContent = '-$' + costoDesgaste.toLocaleString('es-AR');
-    document.getElementById('d-neto').textContent = '$' + neto.toLocaleString('es-AR');
-
-    const hero = document.getElementById('resultado-hero');
-    const num = document.getElementById('resultado-numero');
-    if (porHora < 1000) { hero.classList.add('malo'); num.classList.add('malo'); }
-    else { hero.classList.remove('malo'); num.classList.remove('malo'); }
-
-    let msg = '';
-    if (porHora < 800) msg = `<div class="alerta"><strong>Ojo.</strong> Menos de $800 la hora. Con desgaste y tiempo, no está cerrando. Revisá zona o cantidad de pedidos.</div>`;
-    else if (porHora < 1500) msg = `<div class="buena">Dentro de lo normal para CABA. <strong>Para mejorar:</strong> más pedidos por hora, menos km entre cada uno.</div>`;
-    else msg = `<div class="buena"><strong>Buena jornada.</strong> Por encima del promedio. Anotá zona y horario — repetilo.</div>`;
-    document.getElementById('mensaje-alerta').innerHTML = msg;
-
-    document.getElementById('formulario').style.display = 'none';
-    document.getElementById('resultado').classList.add('visible');
-    renderComentarios();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (datos > 0) {
+    document.getElementById('linea-datos').style.display = 'flex';
+    document.getElementById('d-datos').textContent = '-' + fmt(datos);
   }
-
-  function resetear() {
-    document.getElementById('formulario').style.display = 'block';
-    document.getElementById('resultado').classList.remove('visible');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (costoFijos > 0) {
+    document.getElementById('linea-fijos').style.display = 'flex';
+    document.getElementById('d-fijos').textContent = '-' + fmt(costoFijos);
   }
+  document.getElementById('d-neto').textContent = fmt(neto);
 
-  // COMENTARIOS
-  function getComentarios() {
-    try { return JSON.parse(localStorage.getItem('comentarios') || '[]'); } catch(e) { return []; }
+  const hero = document.getElementById('resultado-hero');
+  const num = document.getElementById('resultado-numero');
+  if (porHora < 2500) { hero.classList.add('malo'); num.classList.add('malo'); }
+  else { hero.classList.remove('malo'); num.classList.remove('malo'); }
+
+  let msg = '';
+  if (porHora < 1000) {
+    msg = `<div class="alerta"><strong>¡Ojo!</strong> Menos de $1.000 la hora. Con desgaste, tiempo y riesgo, esta jornada no cerró. Revisá zona, horario o cantidad de pedidos.</div>`;
+  } else if (porHora < 2500) {
+    msg = `<div class="alerta"><strong>¡Ojo!</strong> Estás por debajo de $2.500 la hora. Con el desgaste de la moto, las horas de espera y el riesgo de la calle, la jornada no está cerrando bien. Probá otra zona o franja horaria.</div>`;
+  } else if (porHora < 4000) {
+    msg = `<div class="buena">Dentro del promedio para CABA. <strong>Para mejorar:</strong> más pedidos por hora, menos km entre cada uno. Anotá la zona y el horario.</div>`;
+  } else {
+    msg = `<div class="buena"><strong>Buena jornada.</strong> Por encima del promedio. Guardá zona y horario — ese dato vale oro.</div>`;
   }
+  document.getElementById('mensaje-alerta').innerHTML = msg;
 
-  function saveComentarios(arr) {
-    try { localStorage.setItem('comentarios', JSON.stringify(arr)); } catch(e){}
-  }
+  document.getElementById('formulario').style.display = 'none';
+  document.getElementById('resultado').classList.add('visible');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 
-  function enviarComentario() {
-    const texto = document.getElementById('comentario-texto').value.trim();
-    const estrellaEl = document.querySelector('input[name="stars"]:checked');
-    if (!texto) { alert('Escribí algo antes de publicar.'); return; }
-    if (!estrellaEl) { alert('Elegí una valoración con estrellas.'); return; }
+  // Guardar en Supabase
+  fetch(SUPA_URL + '/rest/v1/jornada', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', apikey: SUPA_KEY, Authorization: 'Bearer ' + SUPA_KEY, Prefer: 'return=minimal' },
+    body: JSON.stringify({
+      horas, km, precio_nafta: nafta, consumo, desgaste_km: DESGASTE_KM,
+      bruto, gasto_nafta: costoNafta, gasto_desgaste: costoDesgaste,
+      neto, ganancia_hora: porHora,
+      zona: zona || null, plataforma: plataforma || null,
+      marca_moto: marca || null, cilindrada: cilindrada || null,
+      datos_moviles: datos || null, costo_fijos_dia: costoFijos || null
+    })
+  }).catch(()=>{});
 
-    const nuevo = {
-      texto,
-      estrellas: parseInt(estrellaEl.value),
-      fecha: new Date().toLocaleDateString('es-AR', { day:'2-digit', month:'2-digit', year:'numeric' })
-    };
+  cargarComparativa(zona, porHora);
+  renderComentarios();
+}
 
-    const arr = getComentarios();
-    arr.unshift(nuevo);
-    saveComentarios(arr);
+function resetear() {
+  document.getElementById('formulario').style.display = 'block';
+  document.getElementById('resultado').classList.remove('visible');
+  document.getElementById('comparativa-zona').style.display = 'none';
+  document.getElementById('linea-datos').style.display = 'none';
+  document.getElementById('linea-fijos').style.display = 'none';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
-    document.getElementById('comentario-texto').value = '';
-    document.querySelectorAll('input[name="stars"]').forEach(r => r.checked = false);
-    renderComentarios();
-  }
+function compartirWS() {
+  const hora = document.getElementById('resultado-numero').textContent;
+  const neto = document.getElementById('resultado-neto').textContent;
+  const bruto = document.getElementById('resultado-bruto').textContent;
+  const zona = document.getElementById('zona').value;
+  const plataforma = document.getElementById('plataforma').value;
+  let msg = `🛵 *RepartoReal — La Verdad de la Milanesa*\n\n`;
+  msg += `La app me marcó *${bruto}* brutos.\n`;
+  msg += `Después de nafta, desgaste y gastos reales me quedaron *${neto}*.\n`;
+  msg += `Eso es *${hora}/hora* neto.\n`;
+  if (zona) msg += `📍 Zona: ${zona}\n`;
+  if (plataforma) msg += `📱 Plataforma: ${plataforma}\n`;
+  msg += `\n¿Sabés cuánto ganás vos de verdad?\n🔗 https://repartoreal.github.io/repartoreal`;
+  window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+}
 
-  function renderComentarios() {
-    const arr = getComentarios();
-    const lista = document.getElementById('lista-comentarios');
-    const resumen = document.getElementById('rating-resumen');
+function unirseGrupo() {
+  const contacto = document.getElementById('contacto').value.trim();
+  if (!contacto) return;
+  // Guardar contacto en Supabase comentarios (reusar tabla o crear nueva después)
+  fetch(SUPA_URL + '/rest/v1/comentarios', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', apikey: SUPA_KEY, Authorization: 'Bearer ' + SUPA_KEY, Prefer: 'return=minimal' },
+    body: JSON.stringify({ texto: 'CONTACTO: ' + contacto, estrellas: 0 })
+  }).catch(()=>{});
+  document.getElementById('comunidad-ok').style.display = 'block';
+  document.getElementById('btn-grupo').disabled = true;
+  if (LINK_GRUPO !== 'LINK_GRUPO_AQUI') window.open(LINK_GRUPO, '_blank');
+}
 
-    if (arr.length === 0) {
+function donar(monto) {
+  window.open(`https://mpago.la/repartoreal?amount=${monto}`, '_blank');
+}
+
+// Comentarios vía Supabase
+async function enviarComentario() {
+  const texto = document.getElementById('comentario-texto').value.trim();
+  const estrellaEl = document.querySelector('input[name="stars"]:checked');
+  if (!texto) { alert('Escribí algo antes de publicar.'); return; }
+  if (!estrellaEl) { alert('Elegí una valoración con estrellas.'); return; }
+  await fetch(SUPA_URL + '/rest/v1/comentarios', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', apikey: SUPA_KEY, Authorization: 'Bearer ' + SUPA_KEY, Prefer: 'return=minimal' },
+    body: JSON.stringify({ estrellas: parseInt(estrellaEl.value), texto })
+  });
+  document.getElementById('comentario-texto').value = '';
+  document.querySelectorAll('input[name="stars"]').forEach(r => r.checked = false);
+  renderComentarios();
+}
+
+async function renderComentarios() {
+  const lista = document.getElementById('lista-comentarios');
+  const resumen = document.getElementById('rating-resumen');
+  try {
+    const res = await fetch(`${SUPA_URL}/rest/v1/comentarios?select=*&estrellas=gt.0&order=id.desc&limit=20`, {
+      headers: { apikey: SUPA_KEY, Authorization: 'Bearer ' + SUPA_KEY }
+    });
+    const arr = await res.json();
+    if (!Array.isArray(arr) || arr.length === 0) {
       lista.innerHTML = '<div class="no-comentarios">Todavía no hay comentarios. ¡Sé el primero!</div>';
       resumen.style.display = 'none';
       return;
     }
-
-    const promedio = (arr.reduce((s, c) => s + c.estrellas, 0) / arr.length).toFixed(1);
-    const estrellas = '★'.repeat(Math.round(promedio)) + '☆'.repeat(5 - Math.round(promedio));
+    const promedio = (arr.reduce((s,c) => s + (c.estrellas||0), 0) / arr.length).toFixed(1);
+    const ests = '★'.repeat(Math.round(promedio)) + '☆'.repeat(5 - Math.round(promedio));
     resumen.style.display = 'flex';
-    resumen.innerHTML = `
-      <div class="rating-numero">${promedio}</div>
-      <div>
-        <div class="rating-stars">${estrellas}</div>
-        <div class="rating-total">${arr.length} valoración${arr.length !== 1 ? 'es' : ''}</div>
-      </div>`;
-
+    resumen.innerHTML = `<div class="rating-numero">${promedio}</div><div><div class="rating-stars">${ests}</div><div class="rating-total">${arr.length} valoración${arr.length!==1?'es':''}</div></div>`;
     lista.innerHTML = arr.map(c => `
       <div class="comentario-item">
         <div class="comentario-header">
           <span class="comentario-stars">${'★'.repeat(c.estrellas)}${'☆'.repeat(5-c.estrellas)}</span>
-          <span class="comentario-fecha">${c.fecha}</span>
+          <span class="comentario-fecha">${new Date(c.created_at).toLocaleDateString('es-AR')}</span>
         </div>
-        <div class="comentario-texto">${c.texto}</div>
+        <div class="comentario-texto">${c.texto||''}</div>
       </div>`).join('');
+  } catch(e) {
+    lista.innerHTML = '<div class="no-comentarios">No se pudieron cargar los comentarios.</div>';
   }
+}
 </script>
 </body>
 </html>
