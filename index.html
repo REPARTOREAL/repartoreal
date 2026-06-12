@@ -9,7 +9,6 @@
   body{background:#0f172a;color:#f1f5f9;font-family:sans-serif;min-height:100vh;padding:14px;transition:background 0.3s,color 0.3s}
   .wrap{max-width:420px;margin:0 auto}
 
-  /* ── TEMAS ── */
   body.tema-claro{background:#f1f5f9;color:#0f172a}
   body.tema-claro input,body.tema-claro textarea,body.tema-claro select{background:#e2e8f0;border-color:#cbd5e1;color:#0f172a}
   body.tema-claro .card{background:#fff;border-color:#cbd5e1}
@@ -18,6 +17,7 @@
   body.tema-claro .btn-back{border-color:#cbd5e1 !important;color:#64748b}
   body.tema-claro .aviso-txt{color:#64748b}
   body.tema-claro .desglose-row span:first-child{color:#64748b}
+  body.tema-claro .msg-ok{color:#16a34a}
 
   body.tema-naranja{background:#1a0a00;color:#fff3e0}
   body.tema-naranja input,body.tema-naranja textarea,body.tema-naranja select{background:#2d1200;border-color:#7c3a00;color:#fff3e0}
@@ -28,8 +28,7 @@
   body.tema-naranja .aviso-txt{color:#fb923c}
   body.tema-naranja .desglose-row span:first-child{color:#fb923c}
 
-  /* ── BOTONES TEMA ── */
-  .temas{position:absolute;top:14px;right:14px;display:flex;gap:6px}
+  .temas{position:fixed;top:14px;right:14px;display:flex;gap:6px;z-index:999}
   .tema-btn{background:none;border:none;font-size:18px;cursor:pointer;opacity:0.5;transition:opacity 0.2s;padding:2px}
   .tema-btn.activo{opacity:1;transform:scale(1.2)}
 
@@ -66,20 +65,21 @@
   .donacion{text-align:center}
   .donacion h3{font-size:17px;font-weight:900;color:#f97316;margin-bottom:12px}
   .don-items{display:flex;justify-content:space-around}
-  .don-item{text-align:center;cursor:pointer}
+  .don-item{text-align:center;cursor:pointer;text-decoration:none}
   .don-item .emoji{font-size:42px}
   .don-item .monto{font-size:13px;font-weight:700;color:#f97316;margin-top:4px}
   .valorame-title{text-align:center;font-weight:900;font-size:16px;margin-bottom:10px;text-decoration:underline}
   .estrellas{display:flex;justify-content:center;gap:8px;margin-bottom:12px}
   .estrella{font-size:28px;cursor:pointer;opacity:0.3;transition:opacity 0.15s}
   .estrella.on{opacity:1}
-  .aviso-txt{font-size:12px;color:#94a3b8;margin-bottom:8px}
+  .aviso-txt{font-size:12px;color:#94a3b8;margin-bottom:8px;font-weight:700}
   #pantalla-resultado{display:none}
+  .msg-ok{font-size:12px;color:#22c55e;text-align:center;margin-top:6px;font-weight:700;min-height:18px}
+  .error-campo{border-color:#ef4444 !important}
 </style>
 </head>
 <body>
 
-<!-- BOTONES TEMA -->
 <div class="temas">
   <button class="tema-btn" onclick="setTema('oscuro')" title="Oscuro">🌙</button>
   <button class="tema-btn" onclick="setTema('naranja')" title="Naranja">🟠</button>
@@ -96,7 +96,6 @@
     <small>SIN CHUKUS</small>
   </div>
 
-  <!-- SEMÁFORO -->
   <div class="card semaforo">
     <div class="titulo">¿CONVIENE SALIR HOY?</div>
     <div class="luces">
@@ -108,13 +107,10 @@
     <div class="detalle" id="sem-detalle"></div>
   </div>
 
-  <!-- CONTADOR -->
   <div class="contador">🛵 <strong id="contador-num" style="color:#f1f5f9">...</strong> repartidores calcularon hoy</div>
 
-  <!-- PESTAÑA MOTO -->
   <div class="moto-tab">🏍️ &nbsp; MOTO &nbsp; 🏍️</div>
 
-  <!-- FORMULARIO -->
   <div class="card">
     <div class="row" style="margin-bottom:9px">
       <div><label>¿Cuánto ganaste hoy?</label><input id="ganancia" type="number" placeholder="$0"></div>
@@ -125,8 +121,23 @@
       <div><label>Otros gastos</label><input id="otros" type="number" placeholder="$0"></div>
     </div>
     <div class="row" style="margin-bottom:9px">
-      <div><label>Zona</label><input id="zona" type="text" placeholder="Palermo"></div>
-      <div><label>Plataforma</label><input id="plataforma" type="text" placeholder="Rappi"></div>
+      <div>
+        <label>Zona</label>
+        <input id="zona" type="text" placeholder="Almagro">
+      </div>
+      <div>
+        <label>Plataforma</label>
+        <select id="plataforma">
+          <option value="">Seleccioná</option>
+          <option>Rappi</option>
+          <option>PedidosYa</option>
+          <option>Uber Eats</option>
+          <option>MercadoEnvíos</option>
+          <option>Cabify</option>
+          <option>Varias</option>
+          <option>Otra</option>
+        </select>
+      </div>
     </div>
     <div class="row" style="margin-bottom:9px">
       <div><label>Datos móviles/mes</label><input id="datos_moviles" type="number" placeholder="$3.500"></div>
@@ -134,29 +145,46 @@
     </div>
     <div class="row" style="margin-bottom:9px">
       <div><label>Seguro/mes</label><input id="seguro" type="number" placeholder="$8.000"></div>
-      <div><label>Cilindrada</label>
+      <div>
+        <label>Cilindrada</label>
         <select id="cilindrada">
+          <option value="50">50cc</option>
           <option value="110">110cc</option>
           <option value="150" selected>150cc</option>
-          <option value="200">200cc</option>
-          <option value="250">250cc</option>
+          <option value="200">150cc a 300cc</option>
+          <option value="300">+300cc</option>
         </select>
       </div>
     </div>
     <div class="row" style="margin-bottom:12px">
-      <div><label>Marca</label><input id="marca" type="text" placeholder="Zanella"></div>
+      <div>
+        <label>Marca</label>
+        <select id="marca">
+          <option value="">Seleccioná</option>
+          <option>Zanella</option>
+          <option>Motomel</option>
+          <option>Honda</option>
+          <option>Yamaha</option>
+          <option>Bajaj</option>
+          <option>Corven</option>
+          <option>Gilera</option>
+          <option>Beta</option>
+          <option>Mondial</option>
+          <option>Otra</option>
+        </select>
+      </div>
     </div>
     <button class="btn btn-calc" onclick="calcular()">CALCULAR 🧮</button>
   </div>
 
-</div><!-- /pantalla-main -->
+</div>
 
 <!-- ===== PANTALLA RESULTADO ===== -->
 <div id="pantalla-resultado">
 
   <div class="gracias">
     <div class="emojis">🏍️💸🙌💸🏍️</div>
-    <h2>GRACIAS VUELVA PRONTO</h2>
+    <h2>GRACIAS VOLVÉ PRONTO</h2>
   </div>
 
   <div class="card card-accent" style="margin-bottom:12px">
@@ -183,7 +211,7 @@
 
   <div class="card">
     <div class="valorame-title">VALORAME</div>
-    <div class="estrellas" id="estrellas">
+    <div class="estrellas">
       <span class="estrella" onclick="setStar(1)">⭐</span>
       <span class="estrella" onclick="setStar(2)">⭐</span>
       <span class="estrella" onclick="setStar(3)">⭐</span>
@@ -192,60 +220,56 @@
     </div>
     <textarea id="comentario" placeholder="¿Te gustó? ¿Qué agregarías o sacarías?"></textarea>
     <button class="btn" style="background:#f97316;color:#fff;margin-top:8px;margin-bottom:0" onclick="enviarComentario()">ENVIAR</button>
+    <div class="msg-ok" id="msg-comentario"></div>
   </div>
 
   <div class="card">
-    <div class="aviso-txt">📬¿TE GUARDO TU HISTORIAL? ¿TE AVISO CUANDO TU ZONA ESTÉ PAGANDO BIEN?📬</div>
+    <div class="aviso-txt">📬 ¿TE GUARDO TU HISTORIAL? ¿TE AVISO CUANDO TU ZONA ESTÉ PAGANDO BIEN?</div>
     <div class="row">
       <div><label>Mail</label><input id="mail" type="email" placeholder="xxxxx@mail.com"></div>
       <div><label>Teléfono</label><input id="telefono" type="tel" placeholder="11 xxxx-xxxx"></div>
     </div>
     <button class="btn" style="background:#334155;color:#f1f5f9;margin-top:10px;margin-bottom:0" onclick="enviarContacto()">GUARDAR</button>
+    <div class="msg-ok" id="msg-contacto"></div>
   </div>
 
   <div class="card card-accent donacion">
     <h3>DONACIÓN PARA EL CREADOR</h3>
     <div class="don-items">
-      <a href="https://mpago.la/14sDBpG" target="_blank" class="don-item" style="text-decoration:none">
+      <a href="https://mpago.la/14sDBpG" target="_blank" class="don-item">
         <div class="emoji">☕</div>
         <div class="monto">$500</div>
       </a>
-      <div class="don-item">
+      <a href="https://mpago.la/2BoZjpC" target="_blank" class="don-item">
         <div class="emoji">🍺</div>
         <div class="monto">$1.000</div>
-      </div>
-      <div class="don-item">
+      </a>
+      <a href="https://mpago.la/2wcvFpd" target="_blank" class="don-item">
         <div class="emoji">🥟</div>
         <div class="monto">$1.500</div>
-      </div>
+      </a>
     </div>
   </div>
 
   <button class="btn btn-back" onclick="nuevaJornada()">↩ NUEVA JORNADA</button>
 
-</div><!-- /pantalla-resultado -->
-</div><!-- /wrap -->
+</div>
+</div>
 
 <script>
 const SUPABASE_URL = "https://bmlfjyrvktalzgctopeq.supabase.co";
 const SUPABASE_KEY = "sb_publishable_WyFi5lvLux6NVl2l4mfKDA_Qxd02ISJ";
 
-// ── TEMAS ─────────────────────────────────────────────────
 function setTema(t) {
   document.body.classList.remove("tema-claro","tema-naranja");
-  if (t === "claro")   document.body.classList.add("tema-claro");
-  if (t === "naranja") document.body.classList.add("tema-naranja");
-  localStorage.setItem("tema", t);
-  document.querySelectorAll(".tema-btn").forEach(b => b.classList.remove("activo"));
-  const idx = {oscuro:0, naranja:1, claro:2};
-  document.querySelectorAll(".tema-btn")[idx[t]].classList.add("activo");
+  if (t==="claro")   document.body.classList.add("tema-claro");
+  if (t==="naranja") document.body.classList.add("tema-naranja");
+  localStorage.setItem("tema",t);
+  const idx={oscuro:0,naranja:1,claro:2};
+  document.querySelectorAll(".tema-btn").forEach((b,i)=>b.classList.toggle("activo",i===idx[t]));
 }
-(function(){
-  const t = localStorage.getItem("tema") || "oscuro";
-  setTema(t);
-})();
+(()=>{ setTema(localStorage.getItem("tema")||"oscuro"); })();
 
-// ── SEMÁFORO ──────────────────────────────────────────────
 async function initSemaforo() {
   const h = new Date().getHours();
   let color, estado, detalle;
@@ -254,141 +278,133 @@ async function initSemaforo() {
     const d = await r.json();
     const lluvia = d.current_weather.weathercode >= 51;
     const viento = d.current_weather.windspeed > 30;
-    const horaPico = (h >= 11 && h <= 14) || (h >= 19 && h <= 23);
-    if (lluvia)       { color="rojo";     estado="LLUVIA — CUIDADO EN LA CALLE"; }
-    else if (viento)  { color="amarillo"; estado="VIENTO FUERTE — CON PRECAUCIÓN"; }
-    else if (horaPico){ color="verde";    estado="HORA PICO — BUENA CONDICIÓN"; }
-    else              { color="amarillo"; estado="HORA BAJA — FLUJO MODERADO"; }
-    const pad = n => String(n).padStart(2,"0");
-    detalle = `${pad(h)}:${pad(new Date().getMinutes())}hs · ${lluvia?"Con lluvia":"Sin lluvia"}`;
-  } catch(e) {
-    color="amarillo"; estado="SIN DATOS DE CLIMA"; detalle="";
-  }
-  const lr = document.getElementById("luz-r");
-  const la = document.getElementById("luz-a");
-  const lv = document.getElementById("luz-v");
-  lr.style.opacity = la.style.opacity = lv.style.opacity = "0.2";
-  lr.style.boxShadow = la.style.boxShadow = lv.style.boxShadow = "none";
-  if (color==="rojo")    { lr.style.opacity="1"; lr.style.boxShadow="0 0 10px #ef4444"; document.getElementById("sem-estado").style.color="#ef4444"; }
-  if (color==="amarillo"){ la.style.opacity="1"; la.style.boxShadow="0 0 10px #eab308"; document.getElementById("sem-estado").style.color="#eab308"; }
-  if (color==="verde")   { lv.style.opacity="1"; lv.style.boxShadow="0 0 10px #22c55e"; document.getElementById("sem-estado").style.color="#22c55e"; }
-  document.getElementById("sem-estado").textContent = estado;
-  document.getElementById("sem-detalle").textContent = detalle;
+    const pico   = (h>=11&&h<=14)||(h>=19&&h<=23);
+    if (lluvia)      { color="rojo";     estado="LLUVIA — CUIDADO EN LA CALLE"; }
+    else if (viento) { color="amarillo"; estado="VIENTO FUERTE — CON PRECAUCIÓN"; }
+    else if (pico)   { color="verde";    estado="HORA PICO — BUENA CONDICIÓN"; }
+    else             { color="amarillo"; estado="HORA BAJA — FLUJO MODERADO"; }
+    const pad=n=>String(n).padStart(2,"0");
+    detalle=`${pad(h)}:${pad(new Date().getMinutes())}hs · ${lluvia?"Con lluvia":"Sin lluvia"}`;
+  } catch(e) { color="amarillo"; estado="SIN DATOS DE CLIMA"; detalle=""; }
+  const lr=document.getElementById("luz-r");
+  const la=document.getElementById("luz-a");
+  const lv=document.getElementById("luz-v");
+  lr.style.opacity=la.style.opacity=lv.style.opacity="0.2";
+  lr.style.boxShadow=la.style.boxShadow=lv.style.boxShadow="none";
+  if(color==="rojo")    {lr.style.opacity="1";lr.style.boxShadow="0 0 10px #ef4444";document.getElementById("sem-estado").style.color="#ef4444";}
+  if(color==="amarillo"){la.style.opacity="1";la.style.boxShadow="0 0 10px #eab308";document.getElementById("sem-estado").style.color="#eab308";}
+  if(color==="verde")   {lv.style.opacity="1";lv.style.boxShadow="0 0 10px #22c55e";document.getElementById("sem-estado").style.color="#22c55e";}
+  document.getElementById("sem-estado").textContent=estado;
+  document.getElementById("sem-detalle").textContent=detalle;
 }
 
-// ── CONTADOR ──────────────────────────────────────────────
 async function initContador() {
   try {
-    const r = await fetch(`${SUPABASE_URL}/rest/v1/jornada?select=id`, {
-      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }
-    });
-    const d = await r.json();
-    const real = Array.isArray(d) ? d.length : 0;
-    const n = real >= 50 ? real : Math.floor(Math.random() * 121) + 80;
-    document.getElementById("contador-num").textContent = n;
-  } catch(e) {
-    document.getElementById("contador-num").textContent = Math.floor(Math.random()*121)+80;
-  }
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/jornada?select=id`,{headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${SUPABASE_KEY}`}});
+    const d=await r.json();
+    const real=Array.isArray(d)?d.length:0;
+    document.getElementById("contador-num").textContent=real>=50?real:Math.floor(Math.random()*121)+80;
+  } catch(e){ document.getElementById("contador-num").textContent=Math.floor(Math.random()*121)+80; }
 }
 
-// ── CALCULAR ──────────────────────────────────────────────
 function calcular() {
-  const v = id => parseFloat(document.getElementById(id).value) || 0;
-  const ganancia = v("ganancia");
-  const horas    = v("horas") || 1;
-  const naftaL   = v("nafta_precio");
-  const datos    = v("datos_moviles") / 30;
-  const mono     = v("monotributo") / 30;
-  const seguro   = v("seguro") / 30;
-  const otros    = v("otros");
-  const cil      = parseInt(document.getElementById("cilindrada").value);
-  const consumoMap = {110:2.5, 150:3.2, 200:4.0, 250:5.0};
-  const litros = (consumoMap[cil]||3.2) * 80 / 100;
-  const costoNafta = litros * naftaL;
-  const desgaste = ganancia * 0.03;
-  const neto = ganancia - costoNafta - desgaste - datos - mono - seguro - otros;
-  const porHora = neto / horas;
-  const fmt = n => "$" + Math.round(n).toLocaleString("es-AR");
-  document.getElementById("res-hora").textContent     = fmt(porHora < 0 ? 0 : porHora);
-  document.getElementById("res-bruto").textContent    = fmt(ganancia);
-  document.getElementById("res-nafta").textContent    = "-" + fmt(costoNafta);
-  document.getElementById("res-desgaste").textContent = "-" + fmt(desgaste);
-  document.getElementById("res-datos").textContent    = "-" + fmt(datos);
-  document.getElementById("res-mono").textContent     = "-" + fmt(mono);
-  document.getElementById("res-seguro").textContent   = "-" + fmt(seguro);
-  document.getElementById("res-otros").textContent    = otros > 0 ? "-" + fmt(otros) : "$0";
-  document.getElementById("res-neto").textContent     = fmt(neto);
-  fetch(`${SUPABASE_URL}/rest/v1/jornada`, {
+  const v=id=>parseFloat(document.getElementById(id).value)||0;
+  const ganancia=v("ganancia");
+  if(!ganancia){ document.getElementById("ganancia").classList.add("error-campo"); setTimeout(()=>document.getElementById("ganancia").classList.remove("error-campo"),2000); return; }
+  const horas=v("horas")||1;
+  const naftaL=v("nafta_precio");
+  const datos=v("datos_moviles")/30;
+  const mono=v("monotributo")/30;
+  const seg=v("seguro")/30;
+  const otros=v("otros");
+  const cil=parseInt(document.getElementById("cilindrada").value);
+  const consumoMap={50:1.8,110:2.5,150:3.2,200:3.8,300:5.0};
+  const litros=(consumoMap[cil]||3.2)*80/100;
+  const costoNafta=litros*naftaL;
+  const desgaste=ganancia*0.03;
+  const neto=ganancia-costoNafta-desgaste-datos-mono-seg-otros;
+  const porHora=neto/horas;
+  const fmt=n=>"$"+Math.round(n).toLocaleString("es-AR");
+  document.getElementById("res-hora").textContent=fmt(porHora<0?0:porHora);
+  document.getElementById("res-bruto").textContent=fmt(ganancia);
+  document.getElementById("res-nafta").textContent="-"+fmt(costoNafta);
+  document.getElementById("res-desgaste").textContent="-"+fmt(desgaste);
+  document.getElementById("res-datos").textContent="-"+fmt(datos);
+  document.getElementById("res-mono").textContent="-"+fmt(mono);
+  document.getElementById("res-seguro").textContent="-"+fmt(seg);
+  document.getElementById("res-otros").textContent=otros>0?"-"+fmt(otros):"$0";
+  document.getElementById("res-neto").textContent=fmt(neto);
+  fetch(`${SUPABASE_URL}/rest/v1/jornada`,{
     method:"POST",
-    headers:{ apikey:SUPABASE_KEY, Authorization:`Bearer ${SUPABASE_KEY}`, "Content-Type":"application/json", Prefer:"return=minimal" },
-    body: JSON.stringify({
-      ganancia_bruta: ganancia, horas_trabajadas: horas,
-      zona: document.getElementById("zona").value,
-      plataforma: document.getElementById("plataforma").value,
-      ganancia_neta: neto, ganancia_por_hora: porHora,
-      datos_moviles: v("datos_moviles"), costo_fijos_dia: mono + seguro,
-      cilindrada: cil, marca_moto: document.getElementById("marca").value
+    headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${SUPABASE_KEY}`,"Content-Type":"application/json",Prefer:"return=minimal"},
+    body:JSON.stringify({
+      ganancia_bruta:ganancia, horas_trabajadas:horas,
+      zona:document.getElementById("zona").value,
+      plataforma:document.getElementById("plataforma").value,
+      ganancia_neta:neto, ganancia_por_hora:porHora,
+      datos_moviles:v("datos_moviles"), costo_fijos_dia:mono+seg,
+      cilindrada:cil, marca_moto:document.getElementById("marca").value
     })
   }).catch(()=>{});
-  document.getElementById("pantalla-main").style.display = "none";
-  document.getElementById("pantalla-resultado").style.display = "block";
+  document.getElementById("pantalla-main").style.display="none";
+  document.getElementById("pantalla-resultado").style.display="block";
   window.scrollTo(0,0);
 }
 
-// ── COMPARTIR WP ──────────────────────────────────────────
 function compartirWP() {
-  const hora = document.getElementById("res-hora").textContent;
-  const zona = document.getElementById("zona").value || "mi zona";
-  const txt = encodeURIComponent(`Hoy laburé en ${zona} y gané ${hora} por hora de verdad (después de nafta, desgaste y gastos). ¿Vos cuánto ganás? Calculalo en https://repartoreal.github.io/repartoreal`);
-  window.open("https://wa.me/?text=" + txt, "_blank");
+  const hora=document.getElementById("res-hora").textContent;
+  const zona=document.getElementById("zona").value||"mi zona";
+  const txt=encodeURIComponent(`Hoy laburé en ${zona} y gané ${hora} por hora de verdad (después de nafta, desgaste y gastos). ¿Vos cuánto ganás? Calculalo gratis en https://repartoreal.github.io/repartoreal`);
+  window.open("https://wa.me/?text="+txt,"_blank");
 }
 
-// ── ESTRELLAS ─────────────────────────────────────────────
-let starsVal = 0;
-function setStar(n) {
-  starsVal = n;
-  document.querySelectorAll(".estrella").forEach((s,i) => s.classList.toggle("on", i < n));
+let starsVal=0;
+function setStar(n){
+  starsVal=n;
+  document.querySelectorAll(".estrella").forEach((s,i)=>s.classList.toggle("on",i<n));
 }
 
-// ── ENVIAR COMENTARIO ─────────────────────────────────────
-function enviarComentario() {
-  const txt = document.getElementById("comentario").value.trim();
-  if (!txt && !starsVal) return;
-  fetch(`${SUPABASE_URL}/rest/v1/comentarios`, {
+function enviarComentario(){
+  const txt=document.getElementById("comentario").value.trim();
+  if(!txt&&!starsVal) return;
+  fetch(`${SUPABASE_URL}/rest/v1/comentarios`,{
     method:"POST",
-    headers:{ apikey:SUPABASE_KEY, Authorization:`Bearer ${SUPABASE_KEY}`, "Content-Type":"application/json", Prefer:"return=minimal" },
-    body: JSON.stringify({ comentario: txt, estrellas: starsVal, zona: document.getElementById("zona").value })
+    headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${SUPABASE_KEY}`,"Content-Type":"application/json",Prefer:"return=minimal"},
+    body:JSON.stringify({comentario:txt,estrellas:starsVal,zona:document.getElementById("zona").value})
   }).catch(()=>{});
-  document.getElementById("comentario").value = "";
+  document.getElementById("comentario").value="";
   setStar(0);
-  alert("¡Gracias por tu opinión!");
+  const m=document.getElementById("msg-comentario");
+  m.textContent="✅ ¡Gracias por tu opinión!";
+  setTimeout(()=>m.textContent="",3000);
 }
 
-// ── ENVIAR CONTACTO ───────────────────────────────────────
-function enviarContacto() {
-  const mail = document.getElementById("mail").value.trim();
-  const tel  = document.getElementById("telefono").value.trim();
-  if (!mail && !tel) return;
-  fetch(`${SUPABASE_URL}/rest/v1/contactos`, {
+function enviarContacto(){
+  const mail=document.getElementById("mail").value.trim();
+  const tel=document.getElementById("telefono").value.trim();
+  if(!mail&&!tel) return;
+  fetch(`${SUPABASE_URL}/rest/v1/contactos`,{
     method:"POST",
-    headers:{ apikey:SUPABASE_KEY, Authorization:`Bearer ${SUPABASE_KEY}`, "Content-Type":"application/json", Prefer:"return=minimal" },
-    body: JSON.stringify({ mail, telefono: tel, zona: document.getElementById("zona").value })
+    headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${SUPABASE_KEY}`,"Content-Type":"application/json",Prefer:"return=minimal"},
+    body:JSON.stringify({mail,telefono:tel,zona:document.getElementById("zona").value})
   }).catch(()=>{});
-  alert("¡Listo! Te avisamos cuando tu zona esté pagando bien.");
+  const m=document.getElementById("msg-contacto");
+  m.textContent="✅ ¡Listo! Te avisamos cuando tu zona esté pagando bien.";
+  setTimeout(()=>m.textContent="",4000);
 }
 
-// ── NUEVA JORNADA ─────────────────────────────────────────
-function nuevaJornada() {
-  ["ganancia","nafta_precio","horas","otros","zona","plataforma","datos_moviles","monotributo","seguro","marca","mail","telefono","comentario"]
-    .forEach(id => { const el = document.getElementById(id); if(el) el.value = ""; });
-  document.getElementById("cilindrada").value = "150";
+function nuevaJornada(){
+  ["ganancia","nafta_precio","horas","otros","zona","mail","telefono","comentario"]
+    .forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
+  document.getElementById("plataforma").value="";
+  document.getElementById("marca").value="";
+  document.getElementById("cilindrada").value="150";
   setStar(0);
-  document.getElementById("pantalla-resultado").style.display = "none";
-  document.getElementById("pantalla-main").style.display = "block";
+  document.getElementById("pantalla-resultado").style.display="none";
+  document.getElementById("pantalla-main").style.display="block";
   window.scrollTo(0,0);
 }
 
-// ── INIT ──────────────────────────────────────────────────
 initSemaforo();
 initContador();
 </script>
