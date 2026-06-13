@@ -118,7 +118,7 @@
     </div>
     <div class="row" style="margin-bottom:9px">
       <div><label>Horas trabajadas</label><input id="horas" type="number" placeholder="6"></div>
-      <div><label>Otros gastos</label><input id="otros" type="number" placeholder="$0"></div>
+      <div><label>Otros gastos</label><input id="otros" type="number" placeholder="$0" value="0"></div>
     </div>
     <div class="row" style="margin-bottom:9px">
       <div>
@@ -394,7 +394,7 @@ function enviarContacto(){
 }
 
 function nuevaJornada(){
-  ["ganancia","nafta_precio","horas","otros","zona","mail","telefono","comentario"]
+  ["ganancia","nafta_precio","horas","otros","zona","datos_moviles","monotributo","seguro","mail","telefono","comentario"]
     .forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
   document.getElementById("plataforma").value="";
   document.getElementById("marca").value="";
