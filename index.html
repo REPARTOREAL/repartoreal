@@ -312,7 +312,7 @@ function calcular(){
   const seg=g("seguro")/30;
   const cil=parseInt(document.getElementById("cilindrada").value)||150;
   const consumoMap={50:1.8,110:2.5,150:3.2,200:3.8,300:5.0};
-  const litros=(consumoMap[cil]||3.2)*80/100;
+  const litros=(consumoMap[cil]||3.2)*30/100;
   const costoNafta=litros*naftaL;
   const desgaste=ganancia*0.03;
   const neto=ganancia-costoNafta-desgaste-datos-mono-seg;
