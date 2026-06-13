@@ -298,18 +298,13 @@ async function initContador(){
 
 function calcular(){
   const g=id=>parseFloat(document.getElementById(id).value)||0;
-  const ganancia=g("ganancia");
+  const ganancia=Math.min(g("ganancia"),500000);const naftaL=Math.min(g("nafta_precio"),3000);const horas=Math.min(Math.max(g("horas")||1,1),24);const datos=Math.min(g("datos_moviles"),50000)/30;const mono=Math.min(g("monotributo"),200000)/30;const seg=Math.min(g("seguro"),100000)/30;
   if(!ganancia){
     const el=document.getElementById("ganancia");
     el.classList.add("error-campo");
     setTimeout(()=>el.classList.remove("error-campo"),2000);
     return;
   }
-  const horas=g("horas")||1;
-  const naftaL=g("nafta_precio");
-  const datos=g("datos_moviles")/30;
-  const mono=g("monotributo")/30;
-  const seg=g("seguro")/30;
   const cil=parseInt(document.getElementById("cilindrada").value)||150;
   const consumoMap={50:1.8,110:2.5,150:3.2,200:3.8,300:5.0};
   const litros=(consumoMap[cil]||3.2)*30/100;
