@@ -3,779 +3,1318 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RepartoReal — SIN CHUKUS</title>
-<meta name="description" content="Calculadora real para repartidores. Sabé lo que te queda después de nafta, desgaste y costos. Sin chukus.">
+<title>TUTRUCON 🃏</title>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 <style>
-/* ===== TEMAS ===== */
-:root {
-  --bg:#0f0f0f;--card:#1a1a1a;--card2:#222;--border:#2e2e2e;
-  --text:#f5f5f5;--muted:#888;--sub:#555;
-  --accent:#f59e0b;--accent2:#ef4444;--green:#22c55e;--blue:#3b82f6;
-  --radius:14px;
+:root{
+  --bg:#0d1117;--bg2:#161b22;--bg3:#1e2730;--border:#30363d;
+  --green:#3fb950;--red:#f85149;--yellow:#d29922;--blue:#58a6ff;
+  --purple:#bc8cff;--orange:#ff7b72;--text:#e6edf3;--muted:#8b949e;
+  --cardA:#f0e6c8;--cardB:#1a1a2e;--radius:10px;
 }
-body.calido {
-  --bg:#1a0f00;--card:#2a1800;--card2:#331e00;--border:#4a2e00;
-  --text:#fff8ee;--muted:#b07040;--sub:#7a4a20;
-  --accent:#ff9500;--green:#4ade80;
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',system-ui,sans-serif;}
+body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+
+/* LOBBY */
+#lobby{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:2rem 1rem;gap:1.5rem;}
+.logo{font-size:3rem;font-weight:900;letter-spacing:-2px;background:linear-gradient(135deg,#f0c040,#ff7b72);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-align:center;}
+.logo small{display:block;font-size:1rem;letter-spacing:4px;font-weight:400;-webkit-text-fill-color:var(--muted);}
+.card-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:2rem;width:100%;max-width:420px;display:flex;flex-direction:column;gap:1rem;}
+.card-box h2{font-size:1.1rem;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:.5rem;}
+label{font-size:.85rem;color:var(--muted);display:block;margin-bottom:.25rem;}
+input,select{width:100%;padding:.6rem .8rem;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:.95rem;outline:none;transition:border-color .2s;}
+input:focus,select:focus{border-color:var(--blue);}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem;}
+.toggle-row{display:flex;align-items:center;gap:.75rem;cursor:pointer;padding:.5rem 0;}
+.toggle-row input[type=checkbox]{width:1.1rem;height:1.1rem;accent-color:var(--green);cursor:pointer;}
+.toggle-row span{font-size:.95rem;}
+.btn{padding:.7rem 1.4rem;border:none;border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer;transition:all .15s;width:100%;}
+.btn-go{background:linear-gradient(135deg,#238636,#3fb950);color:#fff;}
+.btn-go:hover{filter:brightness(1.15);}
+.btn-sec{background:var(--bg3);color:var(--text);border:1px solid var(--border);}
+.btn-sec:hover{border-color:var(--blue);}
+.join-code{font-size:2.5rem;letter-spacing:.5rem;font-weight:900;text-align:center;color:var(--yellow);font-family:monospace;}
+.err{color:var(--red);font-size:.85rem;text-align:center;min-height:1.2rem;}
+.status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:.4rem;}
+.dot-green{background:var(--green);}
+.dot-yellow{background:var(--yellow);animation:pulse 1s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+
+/* SALA DE ESPERA */
+#waiting-room{display:none;min-height:100vh;padding:2rem 1rem;display:none;flex-direction:column;align-items:center;gap:1.5rem;}
+.players-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:.75rem;width:100%;max-width:600px;}
+.player-slot{background:var(--bg2);border:2px solid var(--border);border-radius:var(--radius);padding:1rem;text-align:center;min-height:80px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.4rem;}
+.player-slot.filled{border-color:var(--green);}
+.player-slot.mine{border-color:var(--blue);}
+.player-slot .avatar{font-size:2rem;}
+.player-slot .pname{font-size:.9rem;font-weight:600;}
+.player-slot .pteam{font-size:.75rem;padding:.2rem .5rem;border-radius:12px;font-weight:600;}
+.team-a{background:#0d2137;color:var(--blue);}
+.team-b{background:#2d1717;color:var(--orange);}
+.slot-empty{color:var(--muted);font-size:.85rem;}
+
+/* MESA DE JUEGO */
+#game{display:none;height:100vh;overflow:hidden;flex-direction:column;}
+.game-inner{flex:1;overflow-y:auto;padding:0 .5rem .5rem;}
+
+/* HEADER */
+.g-header{display:flex;align-items:center;gap:.5rem;padding:.5rem;background:var(--bg2);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
+.g-scores{display:flex;gap:.75rem;font-size:.85rem;}
+.score-team{display:flex;align-items:center;gap:.4rem;}
+.score-bar{height:6px;border-radius:3px;background:var(--border);flex:1;min-width:60px;max-width:100px;}
+.score-fill{height:100%;border-radius:3px;transition:width .4s;}
+.fill-a{background:var(--blue);}
+.fill-b{background:var(--orange);}
+.g-info{flex:1;text-align:center;font-size:.8rem;color:var(--muted);}
+.g-target{font-size:.75rem;color:var(--muted);}
+
+/* TABLERO */
+.board{display:grid;grid-template-rows:auto 1fr auto;gap:.5rem;padding:.5rem;min-height:calc(100vh - 120px);}
+
+/* RIVALS */
+.rivals-row{display:flex;justify-content:center;gap:.75rem;flex-wrap:wrap;}
+
+/* BAJADA CENTRAL */
+.center-zone{display:flex;flex-direction:column;align-items:center;gap:.5rem;}
+.bazas-area{display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center;min-height:80px;align-items:center;}
+.baza-pile{display:flex;align-items:center;justify-content:center;width:54px;height:80px;border-radius:6px;border:2px dashed var(--border);position:relative;font-size:.7rem;color:var(--muted);}
+.played-card{position:absolute;top:0;left:0;width:100%;height:100%;border-radius:6px;}
+.status-banner{text-align:center;font-size:.9rem;font-weight:600;padding:.4rem 1rem;border-radius:20px;background:var(--bg3);border:1px solid var(--border);}
+
+/* COMPAÑEROS */
+.allies-row{display:flex;justify-content:center;gap:.75rem;flex-wrap:wrap;}
+
+/* CARTAS */
+.player-area{display:flex;flex-direction:column;align-items:center;gap:.4rem;min-width:90px;}
+.player-area .pname-small{font-size:.7rem;color:var(--muted);max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.player-area .hand{display:flex;gap:3px;flex-wrap:wrap;justify-content:center;}
+
+/* Carta visual */
+.card{width:48px;height:72px;border-radius:6px;border:2px solid;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:1.1rem;font-weight:800;cursor:default;position:relative;transition:transform .15s,box-shadow .15s;user-select:none;flex-shrink:0;}
+.card.playable{cursor:pointer;border-color:var(--green)!important;}
+.card.playable:hover{transform:translateY(-8px);box-shadow:0 8px 20px rgba(63,185,80,.4);}
+.card.suit-e{background:#fff8e8;border-color:#c8a84b;color:#7a4e00;}
+.card.suit-b{background:#e8f4e8;border-color:#4a7c4a;color:#1a4a1a;}
+.card.suit-o{background:#fff0d4;border-color:#d4860a;color:#7a4200;}
+.card.suit-c{background:#f0e8f8;border-color:#8840c8;color:#4a1a7a;}
+.card .crank{font-size:1.3rem;line-height:1;}
+.card .csuit{font-size:.7rem;margin-top:1px;}
+.card.face-down{background:var(--bg3);border-color:var(--border);background-image:repeating-linear-gradient(45deg,var(--bg2) 0,var(--bg2) 4px,var(--bg3) 4px,var(--bg3) 8px);cursor:default;}
+.card.face-down .crank,.card.face-down .csuit{display:none;}
+.card.ally-mini{width:36px;height:52px;font-size:.85rem;}
+.card.ally-mini .crank{font-size:1rem;}
+.card.ally-mini .csuit{font-size:.6rem;}
+.card.played-on-table{width:38px;height:56px;font-size:.8rem;}
+.card.played-on-table .crank{font-size:.95rem;}
+.card.played-on-table .csuit{font-size:.55rem;}
+.card.small-rival{width:32px;height:46px;font-size:.7rem;}
+.card.small-rival .crank{font-size:.75rem;}
+
+/* MANO DEL JUGADOR LOCAL */
+.my-hand-row{display:flex;justify-content:center;gap:6px;padding:.5rem;flex-wrap:wrap;}
+.my-hand-row .card{width:60px;height:90px;font-size:1.3rem;}
+.my-hand-row .card .crank{font-size:1.6rem;}
+.my-hand-row .card .csuit{font-size:.8rem;}
+
+/* BOTONES DE ACCIÓN */
+.actions-bar{padding:.5rem;display:flex;gap:.4rem;flex-wrap:wrap;justify-content:center;background:var(--bg2);border-top:1px solid var(--border);position:sticky;bottom:0;z-index:99;}
+.act-btn{padding:.45rem .85rem;border:none;border-radius:20px;font-size:.8rem;font-weight:700;cursor:pointer;transition:all .15s;letter-spacing:.5px;}
+.act-btn:hover{filter:brightness(1.15);transform:translateY(-1px);}
+.act-btn.go{background:var(--green);color:#0d1117;}
+.act-btn.yes{background:#0d3a1a;color:var(--green);border:1px solid var(--green);}
+.act-btn.no{background:#3a0d0d;color:var(--red);border:1px solid var(--red);}
+.act-btn.env{background:#1a1a3a;color:var(--blue);border:1px solid var(--blue);}
+.act-btn.tru{background:#2d1a00;color:var(--yellow);border:1px solid var(--yellow);}
+.act-btn.flor{background:#2d0d3a;color:var(--purple);border:1px solid var(--purple);}
+.act-btn.mazo{background:var(--bg3);color:var(--muted);border:1px solid var(--border);}
+.act-btn:disabled{opacity:.35;cursor:not-allowed;transform:none;}
+
+/* CHAT */
+.chat-panel{position:fixed;right:0;bottom:60px;width:280px;max-height:320px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius) 0 0 var(--radius);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .25s;z-index:200;}
+.chat-panel.open{transform:translateX(0);}
+.chat-header{display:flex;align-items:center;justify-content:space-between;padding:.5rem .75rem;border-bottom:1px solid var(--border);font-size:.85rem;font-weight:600;}
+.chat-msgs{flex:1;overflow-y:auto;padding:.5rem;display:flex;flex-direction:column;gap:.25rem;}
+.chat-msg{font-size:.8rem;line-height:1.4;}
+.chat-msg .cm-name{font-weight:700;color:var(--blue);}
+.chat-msg .cm-text{color:var(--text);}
+.chat-msg.sys{color:var(--muted);font-style:italic;}
+.chat-form{display:flex;gap:.4rem;padding:.4rem;}
+.chat-form input{flex:1;padding:.4rem .6rem;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:.8rem;outline:none;}
+.chat-form button{padding:.4rem .6rem;background:var(--blue);border:none;border-radius:6px;color:#fff;cursor:pointer;font-size:.8rem;}
+.chat-toggle{position:fixed;right:.75rem;bottom:.75rem;width:48px;height:48px;border-radius:50%;background:var(--blue);border:none;color:#fff;font-size:1.3rem;cursor:pointer;z-index:201;display:none;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.4);}
+.chat-badge{position:absolute;top:-2px;right:-2px;background:var(--red);color:#fff;font-size:.6rem;border-radius:50%;width:16px;height:16px;display:flex;align-items:center;justify-content:center;display:none;}
+
+/* LOG */
+.game-log{max-height:110px;overflow-y:auto;padding:.4rem .5rem;background:var(--bg2);border-top:1px solid var(--border);font-size:.75rem;color:var(--muted);display:flex;flex-direction:column;gap:2px;}
+.log-entry{padding:1px 0;}
+.log-entry.highlight{color:var(--yellow);}
+
+/* RESULTADO */
+.win-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;z-index:300;display:none;}
+.win-box{background:var(--bg2);border:2px solid var(--green);border-radius:var(--radius);padding:2.5rem 2rem;text-align:center;max-width:360px;display:flex;flex-direction:column;gap:1rem;}
+.win-box h1{font-size:2rem;}
+.win-box .scores-final{font-size:1.5rem;font-weight:700;color:var(--yellow);}
+
+/* FOLD badge */
+.fold-badge{font-size:.6rem;background:#5a1a1a;color:var(--red);border-radius:4px;padding:1px 4px;margin-left:2px;}
+
+/* Indicador de turno */
+.turn-indicator{width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block;margin-right:4px;animation:pulse 1s infinite;}
+
+/* RESPONSIVE */
+@media(max-width:480px){
+  .chat-panel{width:100%;border-radius:var(--radius) var(--radius) 0 0;right:0;bottom:56px;transform:translateY(100%);}
+  .chat-panel.open{transform:translateY(0);}
+  .card{width:44px;height:66px;}
+  .my-hand-row .card{width:56px;height:84px;}
 }
-body.dia {
-  --bg:#f0f2f5;--card:#ffffff;--card2:#f8f9fa;--border:#e0e0e0;
-  --text:#111;--muted:#666;--sub:#aaa;
-  --accent:#d97706;--green:#16a34a;
-}
-
-*{box-sizing:border-box;margin:0;padding:0;}
-html{scroll-behavior:smooth;}
-body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;transition:background .3s,color .3s;}
-
-/* ===== HEADER ===== */
-header{
-  background:var(--card);border-bottom:2px solid var(--accent);
-  padding:14px 20px;position:sticky;top:0;z-index:200;
-  display:flex;flex-direction:column;align-items:center;gap:6px;
-}
-.header-top{width:100%;display:flex;align-items:center;justify-content:space-between;}
-.logo{font-size:1.5rem;font-weight:900;letter-spacing:-1px;color:var(--accent);}
-.logo span{color:var(--text);}
-.tagline{font-size:.65rem;color:var(--muted);letter-spacing:4px;text-align:center;}
-.theme-btns{display:flex;gap:4px;}
-.theme-btn{padding:5px 9px;border-radius:8px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-size:.75rem;cursor:pointer;transition:all .2s;}
-.theme-btn.active{border-color:var(--accent);color:var(--accent);}
-.counter-bar{background:var(--card2);border:1px solid var(--border);border-radius:20px;padding:5px 14px;font-size:.78rem;color:var(--muted);}
-.counter-bar b{color:var(--accent);font-size:.95rem;}
-
-/* ===== HERO ===== */
-.hero{background:linear-gradient(160deg,var(--card) 0%,var(--bg) 100%);padding:28px 20px 18px;text-align:center;border-bottom:1px solid var(--border);}
-.hero h1{font-size:1.7rem;font-weight:900;color:var(--accent);letter-spacing:2px;}
-.hero p{color:var(--muted);font-size:.88rem;margin-top:5px;line-height:1.5;}
-
-/* ===== VEHICLE TABS ===== */
-.vtabs{display:flex;gap:8px;justify-content:center;padding:16px 16px 0;}
-.vtab{flex:1;max-width:120px;padding:11px 0;border-radius:11px;border:2px solid var(--border);
-  background:var(--card);color:var(--muted);font-size:.85rem;font-weight:800;
-  cursor:pointer;text-align:center;transition:all .2s;letter-spacing:.5px;}
-.vtab.active{border-color:var(--accent);color:var(--accent);background:var(--card2);}
-.vtab:hover:not(.active){border-color:var(--sub);color:var(--text);}
-
-/* ===== MAIN ===== */
-main{max-width:500px;margin:0 auto;padding:14px 14px 60px;}
-
-/* ===== CARD ===== */
-.card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);padding:18px;margin-bottom:12px;}
-.card-title{font-size:.68rem;font-weight:900;color:var(--accent);letter-spacing:2.5px;text-transform:uppercase;text-align:center;margin-bottom:14px;}
-
-/* ===== FORM ===== */
-.field{margin-bottom:11px;}
-label{display:block;font-size:.72rem;color:var(--muted);margin-bottom:4px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;}
-.opt{font-size:.65rem;color:var(--sub);font-weight:400;text-transform:none;letter-spacing:0;}
-input,select,textarea{
-  width:100%;background:var(--card2);border:1.5px solid var(--border);
-  color:var(--text);border-radius:9px;padding:10px 12px;font-size:.93rem;
-  outline:none;transition:border .2s;font-family:inherit;
-}
-input:focus,select:focus,textarea:focus{border-color:var(--accent);}
-select option{background:var(--card);}
-textarea{resize:vertical;min-height:78px;}
-.row2{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
-.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;}
-
-/* DIAS */
-.dias-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:3px;}
-.dia-btn{flex:1;min-width:34px;padding:8px 0;border-radius:8px;border:1.5px solid var(--border);
-  background:var(--card2);color:var(--muted);font-size:.72rem;font-weight:800;
-  cursor:pointer;text-align:center;transition:all .2s;}
-.dia-btn.sel{border-color:var(--accent);background:var(--card);color:var(--accent);}
-
-/* COSTOS FIJOS */
-.costos-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-.costo-item{background:var(--card2);border:1.5px solid var(--border);border-radius:10px;padding:10px 11px;}
-.costo-item label{margin-bottom:5px;}
-.costo-item input{background:transparent;border:none;border-bottom:1.5px solid var(--border);border-radius:0;padding:4px 0;font-size:.9rem;}
-.costo-item input:focus{border-bottom-color:var(--accent);}
-
-/* BOTONES */
-.btn-calc{width:100%;padding:16px;background:var(--accent);color:#000;font-size:1.05rem;font-weight:900;border:none;border-radius:12px;cursor:pointer;letter-spacing:1.5px;transition:opacity .2s;margin-top:6px;}
-.btn-calc:hover{opacity:.85;}
-.btn-sec{width:100%;padding:11px;background:transparent;color:var(--muted);font-size:.82rem;font-weight:700;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;margin-top:7px;letter-spacing:1px;transition:all .2s;}
-.btn-sec:hover{border-color:var(--accent2);color:var(--accent2);}
-
-/* ===== RESULTADO ===== */
-#resultado{display:none;}
-.res-hero{text-align:center;padding:22px 8px 14px;}
-.res-badge{font-size:.8rem;font-weight:900;color:var(--accent);letter-spacing:4px;margin-bottom:7px;}
-.res-emojis{font-size:2rem;margin-bottom:8px;}
-.res-num{font-size:3.2rem;font-weight:900;color:var(--green);line-height:1;}
-.res-sub{font-size:.82rem;color:var(--muted);margin-top:5px;}
-.res-positivo .res-num{color:var(--green);}
-.res-negativo .res-num{color:var(--accent2);}
-
-/* DESGLOSE */
-.desglose-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:.88rem;}
-.desglose-row:last-child{border:none;font-weight:800;font-size:.95rem;}
-.neg{color:var(--accent2);}
-.pos{color:var(--green);}
-
-/* PROYECCION */
-.proy-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
-.proy-item{background:var(--card2);border-radius:11px;padding:14px;text-align:center;border:1px solid var(--border);}
-.proy-item .pn{font-size:1.25rem;font-weight:900;color:var(--accent);}
-.proy-item .pl{font-size:.68rem;color:var(--muted);margin-top:4px;line-height:1.3;}
-.proy-meta-ok{color:var(--green)!important;}
-.proy-meta-no{color:var(--accent2)!important;}
-
-/* RANKING */
-.zona-row{display:flex;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);gap:8px;}
-.zona-row:last-child{border:none;}
-.zona-name{min-width:105px;font-size:.78rem;color:var(--text);}
-.zona-bar-w{flex:1;height:7px;background:var(--border);border-radius:4px;}
-.zona-bar{height:7px;border-radius:4px;background:var(--accent);transition:width .6s ease;}
-.zona-val{color:var(--green);font-weight:800;font-size:.78rem;min-width:72px;text-align:right;}
-
-/* STATS */
-.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
-.stat-item{background:var(--card2);border-radius:11px;padding:14px;text-align:center;border:1px solid var(--border);}
-.stat-item .sn{font-size:1.5rem;font-weight:900;color:var(--accent);}
-.stat-item .sl{font-size:.68rem;color:var(--muted);margin-top:4px;}
-
-/* HISTORIAL */
-.hist-item{background:var(--card2);border-radius:10px;padding:11px 13px;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center;border:1px solid var(--border);}
-.hist-gph{color:var(--green);font-weight:900;font-size:1rem;}
-.hist-meta{font-size:.7rem;color:var(--muted);}
-
-/* TIPS */
-.tip-item{background:var(--card2);border-radius:10px;padding:12px 13px;margin-bottom:8px;font-size:.84rem;border-left:3px solid var(--accent);line-height:1.5;}
-.tip-zona{font-size:.68rem;color:var(--muted);margin-top:5px;}
-
-/* COMPARTIR */
-.btn-ws{width:100%;padding:14px;background:#25D366;color:#fff;font-size:.93rem;font-weight:800;border:none;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .2s;}
-.btn-ws:hover{opacity:.85;}
-.btn-img{width:100%;padding:11px;background:var(--card2);color:var(--text);font-size:.83rem;font-weight:700;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;margin-top:7px;transition:all .2s;}
-.btn-img:hover{border-color:var(--accent);color:var(--accent);}
-
-/* ENCUESTA */
-.enc-opts{display:flex;flex-wrap:wrap;gap:7px;margin-top:5px;}
-.enc-btn{padding:7px 13px;border-radius:8px;border:1.5px solid var(--border);background:var(--card2);color:var(--muted);font-size:.8rem;cursor:pointer;transition:all .2s;font-weight:600;}
-.enc-btn.sel{border-color:var(--accent);color:var(--accent);background:var(--card);}
-
-/* COMUNIDAD */
-.btn-primary{width:100%;padding:12px;background:var(--card2);color:var(--accent);font-size:.88rem;font-weight:800;border:1.5px solid var(--accent);border-radius:10px;cursor:pointer;margin-top:8px;letter-spacing:1px;transition:all .2s;}
-.btn-primary:hover{background:var(--accent);color:#000;}
-
-/* DONACION */
-.don-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:4px;}
-.don-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:15px 6px;background:var(--card2);border:1.5px solid var(--border);border-radius:12px;text-decoration:none;color:var(--text);transition:all .2s;cursor:pointer;}
-.don-btn:hover{border-color:var(--accent);background:var(--card);}
-.don-emoji{font-size:1.9rem;}
-.don-monto{font-size:.75rem;font-weight:900;color:var(--accent);}
-
-/* COMENTARIOS */
-.com-title{font-size:1.5rem;font-weight:900;color:var(--text);text-align:center;letter-spacing:1px;}
-.com-sub{font-size:.72rem;color:var(--muted);text-align:center;margin:3px 0 13px;letter-spacing:3px;}
-.com-item{background:var(--card2);border-radius:10px;padding:12px 13px;margin-bottom:8px;font-size:.84rem;border-left:3px solid var(--border);line-height:1.5;}
-.com-meta{font-size:.68rem;color:var(--muted);margin-top:5px;}
-
-/* PROPOSITO */
-.proposito{background:var(--card2);border:1px solid #1e3a5f;border-radius:var(--radius);padding:18px;text-align:center;font-size:.84rem;color:var(--muted);line-height:1.7;}
-.proposito a{color:var(--blue);}
-
-/* BANNER PUB */
-#banner-pub{display:none;background:var(--card2);border:1px dashed var(--border);border-radius:10px;padding:11px 15px;text-align:center;font-size:.78rem;color:var(--muted);margin-top:12px;}
-#banner-pub a{color:var(--accent);}
-
-/* UTILS */
-.mt8{margin-top:8px;}
-.mt12{margin-top:12px;}
-.txt-center{text-align:center;}
-.txt-muted{color:var(--muted);font-size:.8rem;}
 </style>
 </head>
 <body>
 
-<!-- ===== HEADER ===== -->
-<header>
-  <div class="header-top">
-    <div style="width:80px"></div>
+<!-- ===== LOBBY ===== -->
+<div id="lobby">
+  <div class="logo">TUTRUCON<small>TRUCO ARGENTINO</small></div>
+
+  <!-- CREAR -->
+  <div class="card-box" id="create-box">
+    <h2>Crear mesa</h2>
     <div>
-      <div class="logo">Reparto<span>Real</span></div>
-      <div class="tagline">SIN CHUKUS</div>
-    </div>
-    <div class="theme-btns">
-      <button class="theme-btn active" onclick="setTheme('oscuro')" title="Oscuro">🌑</button>
-      <button class="theme-btn" onclick="setTheme('calido')" title="Cálido">🔥</button>
-      <button class="theme-btn" onclick="setTheme('dia')" title="Día">☀️</button>
-    </div>
-  </div>
-  <div class="counter-bar">🛵 Hoy calcularon <b id="cnt">—</b> repartidores</div>
-</header>
-
-<!-- ===== HERO ===== -->
-<div class="hero">
-  <h1>LA VERDAD DE LA MILANESA</h1>
-</div>
-
-<!-- ===== VEHICLE TABS ===== -->
-<div class="vtabs">
-  <div class="vtab active" onclick="setVehiculo('moto',this)">🛵 MOTO</div>
-  <div class="vtab" onclick="setVehiculo('bici',this)">🚲 BICI</div>
-  <div class="vtab" onclick="setVehiculo('auto',this)">🚗 AUTO</div>
-</div>
-
-<main>
-
-<!-- ===== FORMULARIO ===== -->
-<div id="formulario">
-
-<!-- DATOS BÁSICOS -->
-<div class="card">
-  <div class="card-title">Tu jornada</div>
-
-  <div class="field">
-    <label>¿Cuánto ganaste hoy? <span class="opt">(bruto app)</span></label>
-    <input type="number" id="bruto" placeholder="Ej: 45000" inputmode="numeric">
-  </div>
-
-  <div class="field row2">
-    <div>
-      <label>Horas trabajadas</label>
-      <input type="number" id="horas" placeholder="Ej: 6" inputmode="decimal" step="0.5">
+      <label>Tu nombre</label>
+      <input id="cr-name" maxlength="16" placeholder="Nombre…">
     </div>
     <div>
-      <label>Km recorridos <span class="opt">aprox</span></label>
-      <input type="number" id="km" placeholder="Ej: 80" inputmode="numeric">
-    </div>
-  </div>
-
-  <div class="field row2">
-    <div>
-      <label>Zona</label>
-      <select id="zona">
-        <option value="">— elegí —</option>
-        <option>Microcentro</option><option>Palermo</option><option>Caballito</option>
-        <option>Belgrano</option><option>Almagro</option><option>San Telmo</option>
-        <option>Villa Urquiza</option><option>Flores</option><option>Lomas de Zamora</option>
-        <option>La Plata</option><option>Rosario</option><option>Córdoba</option>
-        <option>Otra</option>
-      </select>
-    </div>
-    <div>
-      <label>Plataforma</label>
-      <select id="plataforma">
-        <option value="">— elegí —</option>
-        <option>Rappi</option><option>PedidosYa</option>
-        <option>Ambas</option><option>Independiente</option><option>Otra</option>
-      </select>
-    </div>
-  </div>
-
-  <!-- MOTO FIELDS -->
-  <div id="moto-fields">
-    <div class="field row2">
-      <div>
-        <label>Cilindrada</label>
-        <select id="cilindrada">
-          <option value="110">110cc</option>
-          <option value="150" selected>150cc</option>
-          <option value="200">200cc</option>
-          <option value="250">250cc+</option>
-        </select>
-      </div>
-      <div>
-        <label>Marca</label>
-        <select id="marca">
-          <option>Zanella</option><option>Motomel</option><option>Honda</option>
-          <option>Yamaha</option><option>Beta</option><option>Bajaj</option><option>Otra</option>
-        </select>
+      <label>Jugadores</label>
+      <div class="row3">
+        <button class="btn btn-sec players-btn active-choice" data-v="2">1 vs 1</button>
+        <button class="btn btn-sec players-btn" data-v="4">2 vs 2</button>
+        <button class="btn btn-sec players-btn" data-v="6">3 vs 3</button>
       </div>
     </div>
-    <div class="field row2">
-      <div>
-        <label>Precio nafta <span class="opt">$/L</span></label>
-        <input type="number" id="nafta" placeholder="Ej: 2100" inputmode="numeric">
-      </div>
-      <div>
-        <label>Datos móviles <span class="opt">$/mes</span></label>
-        <input type="number" id="datos" placeholder="Ej: 6000" inputmode="numeric">
-      </div>
-    </div>
-  </div>
-
-  <!-- AUTO FIELDS -->
-  <div id="auto-fields" style="display:none">
-    <div class="field row2">
-      <div>
-        <label>Precio nafta <span class="opt">$/L</span></label>
-        <input type="number" id="nafta-auto" placeholder="Ej: 2100" inputmode="numeric">
-      </div>
-      <div>
-        <label>Consumo <span class="opt">L/100km</span></label>
-        <input type="number" id="consumo-auto" placeholder="Ej: 10" inputmode="decimal" step="0.5">
-      </div>
-    </div>
-    <div class="field">
-      <label>Datos móviles <span class="opt">$/mes</span></label>
-      <input type="number" id="datos-auto" placeholder="Ej: 6000" inputmode="numeric">
-    </div>
-  </div>
-
-  <!-- BICI: no tiene nafta -->
-  <div id="bici-fields" style="display:none">
-    <div class="field">
-      <label>Datos móviles <span class="opt">$/mes</span></label>
-      <input type="number" id="datos-bici" placeholder="Ej: 6000" inputmode="numeric">
-    </div>
-  </div>
-
-  <div class="field">
-    <label>¿Cuántos días por semana laburás?</label>
-    <div class="dias-row" id="dias-row">
-      <div class="dia-btn sel" data-d="1">L</div>
-      <div class="dia-btn sel" data-d="2">Ma</div>
-      <div class="dia-btn sel" data-d="3">Mi</div>
-      <div class="dia-btn sel" data-d="4">J</div>
-      <div class="dia-btn sel" data-d="5">V</div>
-      <div class="dia-btn" data-d="6">S</div>
-      <div class="dia-btn" data-d="0">D</div>
-    </div>
-  </div>
-
-  <div class="field">
-    <label>Costos fijos <span class="opt">opcionales</span></label>
-    <div class="costos-grid">
-      <div class="costo-item">
-        <label>Monotributo <span class="opt">$/mes</span></label>
-        <input type="number" id="monotributo" placeholder="Ej: 15000" inputmode="numeric">
-      </div>
-      <div class="costo-item">
-        <label>Seguro <span class="opt">$/mes</span></label>
-        <input type="number" id="seguro" placeholder="Ej: 25000" inputmode="numeric">
-      </div>
-    </div>
-  </div>
-
-</div>
-
-<button class="btn-calc" onclick="calcular()">⚡ CALCULAR MI GANANCIA REAL</button>
-</div><!-- /formulario -->
-
-<!-- ===== RESULTADO ===== -->
-<div id="resultado">
-
-  <!-- NÚMERO PRINCIPAL -->
-  <div class="card" id="res-card">
-    <div class="res-hero">
-      <div class="res-badge">GRACIAS VUELVA PRONTO</div>
-      <div class="res-emojis" id="res-emojis">💰💰💰</div>
-      <div class="res-num" id="res-gph">$0/h</div>
-      <div class="res-sub">ganancia neta por hora</div>
-    </div>
-    <div id="desglose"></div>
-  </div>
-
-  <!-- PROYECCIÓN -->
-  <div class="card">
-    <div class="card-title">Proyección</div>
-    <div class="proy-grid">
-      <div class="proy-item">
-        <div class="pn" id="proy-semana">$0</div>
-        <div class="pl">Esta semana</div>
-      </div>
-      <div class="proy-item">
-        <div class="pn" id="proy-mes">$0</div>
-        <div class="pl">Este mes</div>
-      </div>
-      <div class="proy-item">
-        <div class="pn" id="proy-usd">U$S 0</div>
-        <div class="pl">Al mes en USD</div>
-      </div>
-      <div class="proy-item">
-        <div class="pn" id="proy-meta">—</div>
-        <div class="pl">¿Llegás a U$S 750?</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- RANKING ZONAS -->
-  <div class="card">
-    <div class="card-title">Ranking de zonas — neto/hora promedio</div>
-    <div id="ranking-zonas"></div>
-  </div>
-
-  <!-- STATS CABA -->
-  <div class="card">
-    <div class="card-title">Esta semana en la red</div>
-    <div class="stat-grid">
-      <div class="stat-item">
-        <div class="sn">🛵 <span id="stat-cnt">143</span></div>
-        <div class="sl">repartidores calcularon esta semana</div>
-      </div>
-      <div class="stat-item">
-        <div class="sn">$6.200</div>
-        <div class="sl">neto/hora promedio CABA</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- HISTORIAL -->
-  <div class="card">
-    <div class="card-title">Tus últimas jornadas</div>
-    <div id="historial"></div>
-    <div class="txt-muted txt-center mt8">Solo en este dispositivo · sin cuenta · sin login</div>
-  </div>
-
-  <!-- TIPS -->
-  <div class="card">
-    <div class="card-title">Tips de la comunidad 💬</div>
-    <div class="tip-item">"La hora pico del mediodía en Microcentro es la más rentable. La del sábado a la noche en Palermo también explota."<div class="tip-zona">— Repartidor de Microcentro</div></div>
-    <div class="tip-item">"Con la moto llena al inicio del turno ahorrás paradas y perdés menos tiempo muerto."<div class="tip-zona">— Repartidor de Caballito</div></div>
-    <div class="tip-item">"Rappi paga mejor por km, PedidosYa tiene más volumen. Las dos juntas es lo que más rinde."<div class="tip-zona">— Repartidor de Belgrano</div></div>
-  </div>
-
-  <!-- COMPARTIR -->
-  <div class="card">
-    <div class="card-title">Compartir resultado</div>
-    <button class="btn-ws" onclick="compartirWS()">📲 Compartir por WhatsApp</button>
-    <button class="btn-img" onclick="alert('Próximamente: guardar como imagen 📸')">📸 Guardar como imagen</button>
-  </div>
-
-  <!-- ENCUESTA -->
-  <div class="card">
-    <div class="card-title">¿Cómo laburás?</div>
-    <label>Plataforma que usás</label>
-    <div class="enc-opts" id="enc-plat">
-      <div class="enc-btn" onclick="selEnc(this,'enc-plat')">Rappi</div>
-      <div class="enc-btn" onclick="selEnc(this,'enc-plat')">PedidosYa</div>
-      <div class="enc-btn" onclick="selEnc(this,'enc-plat')">Ambas</div>
-      <div class="enc-btn" onclick="selEnc(this,'enc-plat')">Independiente</div>
-    </div>
-  </div>
-
-  <!-- COMUNIDAD -->
-  <div class="card">
-    <div class="card-title">Comunidad</div>
-    <p class="txt-muted txt-center" style="margin-bottom:12px;line-height:1.6;">Dejá tu mail y/o teléfono y te avisamos cuando hay novedades, mejoras y datos nuevos de tu zona.</p>
     <div class="row2">
       <div>
-        <label>Mail</label>
-        <input type="email" id="com-mail" placeholder="tu@mail.com">
+        <label>A cuántos puntos</label>
+        <select id="cr-target">
+          <option value="15">15 puntos</option>
+          <option value="30" selected>30 puntos</option>
+        </select>
       </div>
       <div>
-        <label>Teléfono</label>
-        <input type="tel" id="com-tel" placeholder="11 1234-5678">
+        <label>Envido lo canta</label>
+        <select id="cr-canta">
+          <option value="any">Cualquiera</option>
+          <option value="pie">Solo el pie</option>
+        </select>
       </div>
     </div>
-    <button class="btn-primary" onclick="sumarme()">🛵 SUMARME A LA COMUNIDAD</button>
+    <label class="toggle-row">
+      <input type="checkbox" id="cr-flor" checked>
+      <span>Jugar con flor 🌸</span>
+    </label>
+    <label class="toggle-row">
+      <input type="checkbox" id="cr-chat" checked>
+      <span>Chat de mesa 💬</span>
+    </label>
+    <div class="err" id="cr-err"></div>
+    <button class="btn btn-go" id="cr-btn">Crear mesa</button>
+    <button class="btn btn-sec" onclick="showJoin()">→ Unirme a una mesa</button>
   </div>
 
-  <!-- DONACION -->
-  <div class="card">
-    <div class="card-title">DONACIÓN PARA EL CREADOR</div>
-    <p class="txt-muted txt-center" style="margin-bottom:10px;line-height:1.5;">Si te sirvió, con un café alcanza.<br>Cada peso va directo a seguir mejorando esto.</p>
-    <div class="don-grid">
-      <a class="don-btn" href="https://mpago.la/14sDBpG" target="_blank">
-        <span class="don-emoji">☕</span><span class="don-monto">$500</span>
-      </a>
-      <a class="don-btn" href="https://ko-fi.com/repartoreal" target="_blank">
-        <span class="don-emoji">🍺</span><span class="don-monto">$1.000</span>
-      </a>
-      <a class="don-btn" href="https://ko-fi.com/repartoreal" target="_blank">
-        <span class="don-emoji">🥟</span><span class="don-monto">$1.500</span>
-      </a>
+  <!-- UNIRSE -->
+  <div class="card-box" id="join-box" style="display:none">
+    <h2>Unirse a mesa</h2>
+    <div>
+      <label>Tu nombre</label>
+      <input id="jo-name" maxlength="16" placeholder="Nombre…">
+    </div>
+    <div>
+      <label>Código de mesa</label>
+      <input id="jo-code" maxlength="8" placeholder="XXXX" style="text-transform:uppercase;letter-spacing:4px;font-size:1.3rem;font-weight:700;text-align:center;">
+    </div>
+    <div class="err" id="jo-err"></div>
+    <button class="btn btn-go" id="jo-btn">Unirme</button>
+    <button class="btn btn-sec" onclick="showCreate()">← Volver a crear</button>
+  </div>
+</div>
+
+<!-- ===== SALA DE ESPERA ===== -->
+<div id="waiting-room" style="display:none">
+  <div class="logo" style="font-size:2rem">Sala de espera</div>
+  <div>
+    <div style="text-align:center;margin-bottom:.5rem;color:var(--muted);font-size:.9rem;">Código de mesa — compartí este código con tus amigos</div>
+    <div class="join-code" id="room-code">----</div>
+  </div>
+  <div id="wr-config" style="font-size:.85rem;color:var(--muted);text-align:center;"></div>
+  <div class="players-grid" id="wr-players"></div>
+  <div class="err" id="wr-err"></div>
+  <button class="btn btn-go" id="start-btn" style="max-width:300px;display:none">▶ ¡Empezar partida!</button>
+  <div id="wr-waiting-msg" style="color:var(--muted);font-size:.9rem;text-align:center;"></div>
+  <button class="btn btn-sec" style="max-width:300px" onclick="leaveRoom()">Salir de la mesa</button>
+</div>
+
+<!-- ===== MESA DE JUEGO ===== -->
+<div id="game" style="display:none">
+  <div class="g-header">
+    <div class="g-scores">
+      <div class="score-team">
+        <span id="score-a-name" style="color:var(--blue);font-weight:700"></span>&nbsp;
+        <span id="score-a-val" style="font-weight:700;color:var(--blue)">0</span>
+        <div class="score-bar"><div class="score-fill fill-a" id="bar-a" style="width:0%"></div></div>
+      </div>
+      <div class="g-target" id="g-target-lbl"></div>
+      <div class="score-team">
+        <div class="score-bar"><div class="score-fill fill-b" id="bar-b" style="width:0%"></div></div>
+        <span id="score-b-val" style="font-weight:700;color:var(--orange)">0</span>&nbsp;
+        <span id="score-b-name" style="color:var(--orange);font-weight:700"></span>
+      </div>
+    </div>
+    <div class="g-info" id="g-hand-info"></div>
+  </div>
+
+  <div class="game-inner">
+    <div class="board">
+      <!-- RIVALES -->
+      <div class="rivals-row" id="rivals-row"></div>
+
+      <!-- ZONA CENTRAL -->
+      <div class="center-zone">
+        <div class="status-banner" id="status-banner">—</div>
+        <div class="bazas-area" id="bazas-area"></div>
+        <!-- Compañeros con sus cartas -->
+        <div class="allies-row" id="allies-row"></div>
+      </div>
+
+      <!-- MI MANO -->
+      <div>
+        <div style="text-align:center;font-size:.8rem;color:var(--muted);margin-bottom:.3rem" id="my-label">Tu mano</div>
+        <div class="my-hand-row" id="my-hand"></div>
+      </div>
+    </div>
+
+    <!-- LOG -->
+    <div class="game-log" id="game-log"></div>
+  </div>
+
+  <!-- ACCIONES -->
+  <div class="actions-bar" id="actions-bar"></div>
+</div>
+
+<!-- WIN OVERLAY -->
+<div class="win-overlay" id="win-overlay">
+  <div class="win-box">
+    <div id="win-icon" style="font-size:3rem">🏆</div>
+    <h1 id="win-title">¡Ganaron!</h1>
+    <div class="scores-final" id="win-scores"></div>
+    <button class="btn btn-go" onclick="doReset()">REVANCHA</button>
+    <button class="btn btn-sec" onclick="leaveRoom()">Salir</button>
+  </div>
+</div>
+
+<!-- CHAT -->
+<button class="chat-toggle" id="chat-toggle" onclick="toggleChat()">
+  💬<span class="chat-badge" id="chat-badge">0</span>
+</button>
+<div class="chat-panel" id="chat-panel">
+  <div class="chat-header">
+    <span>Chat 💬</span>
+    <div style="display:flex;align-items:center;gap:.5rem">
+      <span id="chat-lock-icon" style="font-size:1rem"></span>
+      <button onclick="toggleChat()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem">✕</button>
     </div>
   </div>
-
-  <!-- COMENTARIOS -->
-  <div class="card">
-    <div class="com-title">¿TE GUSTÓ?</div>
-    <div class="com-sub">VALORAME</div>
-    <textarea id="txt-comentario" placeholder="¿Te sirvió? ¿Qué le agregarías? ¿Qué le sacarías?"></textarea>
-    <button class="btn-primary" onclick="enviarComentario()">ENVIAR OPINIÓN</button>
-    <div id="com-list" style="margin-top:12px;">
-      <div class="com-item">"Por fin algo que dice la verdad. Gracias!"<div class="com-meta">Repartidor de Caballito · hace 2 días</div></div>
-      <div class="com-item">"Le agregaría desgaste de frenos pero está muy bueno igual."<div class="com-meta">Repartidor de Belgrano · hace 5 días</div></div>
-    </div>
+  <div class="chat-msgs" id="chat-msgs"></div>
+  <div class="chat-form" id="chat-form">
+    <input id="chat-input" placeholder="Mensaje…" maxlength="80" onkeydown="if(event.key==='Enter')sendChat()">
+    <button onclick="sendChat()">↑</button>
   </div>
+</div>
 
-  <!-- PROPÓSITO -->
-  <div class="card proposito">
-    Esta herramienta la hice para que los repartidores tengan la verdad en la mano. 🛵<br><br>
-  </div>
-
-  <div id="banner-pub">
-    📢 Espacio publicitario disponible — <a href="mailto:axelgodoy.mds@gmail.com">axelgodoy.mds@gmail.com</a>
-  </div>
-
-  <button class="btn-sec mt12" onclick="nuevaJornada()">+ Nueva jornada</button>
-
-</div><!-- /resultado -->
-</main>
-
-<!-- ===== SUPABASE ===== -->
+<!-- ===== ENGINE ===== -->
 <script>
-const SB_URL = 'https://bmlfjyrvktalzgctopeq.supabase.co';
-const SB_KEY = 'sb_publishable_WyFi5lvLux6NVl2l4mfKDA_Qxd02ISJ';
-const USD    = 1350;
+(function(){
+'use strict';
+var SUITS = ['e', 'b', 'o', 'c'];
+var RANKS = [1, 2, 3, 4, 5, 6, 7, 10, 11, 12];
+var SUIT_NAME = { e: 'espada', b: 'basto', o: 'oro', c: 'copa' };
+var SUIT_SYM = { e: '⚔️', b: '🪵', o: '🪙', c: '🏆' };
+function makeDeck() {
+  var d = [];
+  for (var i = 0; i < SUITS.length; i++)
+    for (var j = 0; j < RANKS.length; j++) d.push(String(RANKS[j]) + SUITS[i]);
+  return d;
+}
+function rk(c) { return parseInt(c, 10); }
+function st(c) { return c.charAt(c.length - 1); }
+function power(c) {
+  var s = st(c), r = rk(c);
+  if (r === 1 && s === 'e') return 14;
+  if (r === 1 && s === 'b') return 13;
+  if (r === 7 && s === 'e') return 12;
+  if (r === 7 && s === 'o') return 11;
+  return { 3: 10, 2: 9, 1: 8, 12: 7, 11: 6, 10: 5, 7: 4, 6: 3, 5: 2, 4: 1 }[r];
+}
+function ev(c) { var r = rk(c); return r <= 7 ? r : 0; }
+function envidoOf(h) {
+  var b = 0, i, j;
+  for (i = 0; i < h.length; i++) {
+    b = Math.max(b, ev(h[i]));
+    for (j = i + 1; j < h.length; j++)
+      if (st(h[i]) === st(h[j])) b = Math.max(b, 20 + ev(h[i]) + ev(h[j]));
+  }
+  return b;
+}
+function isFlor(h) { return h && h.length === 3 && st(h[0]) === st(h[1]) && st(h[1]) === st(h[2]); }
+function florOf(h) { return 20 + ev(h[0]) + ev(h[1]) + ev(h[2]); }
+function clone(o) { return JSON.parse(JSON.stringify(o)); }
+function other(t) { return t === 'A' ? 'B' : 'A'; }
+function emptyHandFields(mano) {
+  return {
+    mano: mano, dealt: false, handOver: false,
+    hands: {}, initHands: {}, folded: {}, trick: 0,
+    leader: mano, turn: mano,
+    played: { t0: {}, t1: {}, t2: {} },
+    results: [],
+    env: { chain: [], waitTeam: null, done: false },
+    tru: { val: 1, offerVal: null, offBy: null, waitTeam: null, lastRaiser: null, heldWait: null },
+    flor: { decl: {}, state: null, lvl: 0, by: null, raiser: null, waitTeam: null }
+  };
+}
+function newGame(config, names) {
+  var n = config.players;
+  var seats = [];
+  for (var i = 0; i < n; i++) seats.push({ name: names[i] || ('Jugador ' + (i + 1)), team: i % 2 === 0 ? 'A' : 'B' });
+  var g = { v: 1, config: config, n: n, seats: seats, target: config.target, scores: { A: 0, B: 0 }, status: 'playing', winner: null, handNum: 0, log: [] };
+  var h = emptyHandFields(0);
+  for (var k in h) g[k] = h[k];
+  return g;
+}
+function norm(g) {
+  g.log = g.log || [];
+  g.played = g.played || {};
+  g.played.t0 = g.played.t0 || {}; g.played.t1 = g.played.t1 || {}; g.played.t2 = g.played.t2 || {};
+  g.folded = g.folded || {};
+  g.results = g.results || [];
+  g.hands = g.hands || {};
+  g.initHands = g.initHands || {};
+  for (var i = 0; i < g.n; i++) { g.hands['s' + i] = g.hands['s' + i] || []; g.initHands['s' + i] = g.initHands['s' + i] || []; }
+  g.env = g.env || {}; g.env.chain = g.env.chain || [];
+  if (g.env.waitTeam === undefined) g.env.waitTeam = null;
+  g.env.done = !!g.env.done;
+  g.tru = g.tru || {}; if (!g.tru.val) g.tru.val = 1;
+  ['offerVal', 'offBy', 'waitTeam', 'lastRaiser', 'heldWait'].forEach(function (k) { if (g.tru[k] === undefined) g.tru[k] = null; });
+  g.flor = g.flor || {}; g.flor.decl = g.flor.decl || {};
+  if (g.flor.state === undefined) g.flor.state = null;
+  if (g.flor.waitTeam === undefined) g.flor.waitTeam = null;
+  g.flor.lvl = g.flor.lvl || 0;
+  return g;
+}
+function teamOf(g, s) { return g.seats[s].team; }
+function activeSeats(g) {
+  var a = [];
+  for (var i = 0; i < g.n; i++) if (!g.folded['s' + i]) a.push(i);
+  return a;
+}
+function orderFrom(g, l) {
+  var o = [];
+  for (var k = 0; k < g.n; k++) { var s = (l + k) % g.n; if (!g.folded['s' + s]) o.push(s); }
+  return o;
+}
+function pieOf(g, team) {
+  var o = orderFrom(g, g.mano), last = null;
+  for (var i = 0; i < o.length; i++) if (teamOf(g, o[i]) === team) last = o[i];
+  return last;
+}
+function cantaOK(g, seat) {
+  if (g.config.canta !== 'pie') return true;
+  var p = pieOf(g, teamOf(g, seat));
+  return p === null ? true : p === seat;
+}
+function florAny(g) { for (var k in g.flor.decl) if (g.flor.decl[k]) return true; return false; }
+function anyWait(g) { return !!(g.env.waitTeam || g.tru.waitTeam || g.flor.waitTeam); }
+function log(g, seat, text) {
+  g.log.push({ i: g.log.length ? g.log[g.log.length - 1].i + 1 : 1, s: seat, x: text });
+  if (g.log.length > 80) g.log = g.log.slice(g.log.length - 80);
+}
+function addPts(g, team, p, label) {
+  if (p <= 0) return;
+  g.scores[team] += p;
+  log(g, -1, label + ': +' + p + ' para ' + (team === 'A' ? 'Equipo 1' : 'Equipo 2'));
+  if (g.scores[team] >= g.target) {
+    g.status = 'finished'; g.winner = team; g.handOver = true;
+    log(g, -1, '🏆 ¡Ganó ' + (team === 'A' ? 'Equipo 1' : 'Equipo 2') + ' ' + g.scores.A + '-' + g.scores.B + '!');
+  }
+}
+function faltaVal(g) { return Math.max(1, g.target - Math.max(g.scores.A, g.scores.B)); }
+function chainItemVal(g, t) { return t === 'E' ? 2 : t === 'R' ? 3 : faltaVal(g); }
+function chainQuieroVal(g) {
+  var s = 0;
+  for (var i = 0; i < g.env.chain.length; i++) s += chainItemVal(g, g.env.chain[i].t);
+  return s;
+}
+function chainNoQuieroVal(g) {
+  var ch = g.env.chain;
+  if (ch.length <= 1) return 1;
+  var s = 0;
+  for (var i = 0; i < ch.length - 1; i++) s += chainItemVal(g, ch[i].t);
+  return s;
+}
+function trickDone(g) {
+  var act = activeSeats(g), pl = g.played['t' + g.trick];
+  for (var i = 0; i < act.length; i++) if (pl['s' + act[i]] == null) return false;
+  return act.length > 0;
+}
+function decide(rs, manoTeam) {
+  var a = rs[0], b = rs[1], c = rs[2];
+  if (!a) return null;
+  if (a !== 'P') {
+    if (!b) return null;
+    if (b === a || b === 'P') return a;
+    if (!c) return null;
+    return c !== 'P' ? c : a;
+  }
+  if (!b) return null;
+  if (b !== 'P') return b;
+  if (!c) return null;
+  if (c !== 'P') return c;
+  return manoTeam;
+}
+function finishHand(g, team, pts, label) { addPts(g, team, pts, label); g.handOver = true; }
+function stepTurn(g) {
+  if (g.handOver || anyWait(g)) return;
+  if (!trickDone(g)) {
+    var o = orderFrom(g, g.leader), pl = g.played['t' + g.trick];
+    for (var i = 0; i < o.length; i++) if (pl['s' + o[i]] == null) { g.turn = o[i]; return; }
+    return;
+  }
+  var act = activeSeats(g), pl2 = g.played['t' + g.trick];
+  var best = -1, winners = [];
+  var ord = orderFrom(g, g.leader);
+  for (var j = 0; j < ord.length; j++) {
+    var s = ord[j], p = power(pl2['s' + s]);
+    if (p > best) { best = p; winners = [s]; } else if (p === best) winners.push(s);
+  }
+  var tset = {}, tcount = 0;
+  for (var w = 0; w < winners.length; w++) { var t = teamOf(g, winners[w]); if (!tset[t]) { tset[t] = 1; tcount++; } }
+  var res = tcount > 1 ? 'P' : teamOf(g, winners[0]);
+  g.results.push(res);
+  if (res === 'P') {
+    g.leader = orderFrom(g, g.mano)[0];
+    log(g, -1, 'Baza ' + (g.trick + 1) + ': ¡parda!');
+  } else {
+    for (var q = 0; q < ord.length; q++) if (winners.indexOf(ord[q]) >= 0 && teamOf(g, ord[q]) === res) { g.leader = ord[q]; break; }
+    log(g, -1, 'Baza ' + (g.trick + 1) + ': ' + (res === 'A' ? 'Equipo 1' : 'Equipo 2'));
+  }
+  var dec = decide(g.results, teamOf(g, g.mano));
+  if (dec) { finishHand(g, dec, g.tru.val, 'Mano'); return; }
+  if (g.trick >= 2) { finishHand(g, teamOf(g, g.mano), g.tru.val, 'Mano (parda total)'); return; }
+  g.trick++;
+  g.turn = g.leader;
+}
+function restoreHeldTruco(g) { if (g.tru.heldWait) { g.tru.waitTeam = g.tru.heldWait; g.tru.heldWait = null; } }
+function resolveEnvidoQuiero(g) {
+  var bestVal = -1, bestSeat = null;
+  var ord = orderFrom(g, g.mano);
+  var vals = { A: -1, B: -1 };
+  for (var i = 0; i < ord.length; i++) {
+    var s = ord[i], v = envidoOf(g.initHands['s' + s]);
+    var t = teamOf(g, s);
+    if (v > vals[t]) vals[t] = v;
+    if (v > bestVal) { bestVal = v; bestSeat = s; }
+  }
+  var winT = teamOf(g, bestSeat);
+  var pts = chainQuieroVal(g);
+  log(g, -1, 'Envido: Eq1=' + (vals.A < 0 ? '-' : vals.A) + ' Eq2=' + (vals.B < 0 ? '-' : vals.B));
+  g.env.done = true; g.env.waitTeam = null;
+  addPts(g, winT, pts, 'Envido');
+  restoreHeldTruco(g);
+}
+function envidoNoQuiero(g, refuserTeam) {
+  var pts = chainNoQuieroVal(g);
+  g.env.done = true; g.env.waitTeam = null;
+  addPts(g, other(refuserTeam), pts, 'Envido no querido');
+  restoreHeldTruco(g);
+}
+function bestFlorTeamCompare(g) {
+  var ord = orderFrom(g, g.mano), best = -1, seat = null;
+  for (var i = 0; i < ord.length; i++) {
+    var h = g.initHands['s' + ord[i]];
+    if (isFlor(h)) { var v = florOf(h); if (v > best) { best = v; seat = ord[i]; } }
+  }
+  return { team: teamOf(g, seat), val: best };
+}
+function florNoQuiero(g, refuserTeam) {
+  var lvl = g.flor.lvl;
+  if (lvl === 1) addPts(g, g.flor.by, 4, 'Flor (se achicaron)');
+  else if (lvl === 2) addPts(g, g.flor.raiser, 4, 'Contraflor no querida');
+  else addPts(g, g.flor.raiser, 6, 'Contraflor al resto no querida');
+  g.flor.state = 'done'; g.flor.waitTeam = null;
+  restoreHeldTruco(g);
+}
+function killEnvidoByFlor(g) {
+  if (!g.env.done && g.env.chain.length) log(g, -1, '¡FLOR! El envido no cuenta.');
+  g.env.done = true; g.env.waitTeam = null;
+}
+function teamFoldEnd(g, loserTeam) {
+  var winT = other(loserTeam);
+  if (g.flor.waitTeam) florNoQuiero(g, loserTeam);
+  if (g.status === 'finished') return;
+  if (!g.env.done && !florAny(g)) {
+    if (g.env.waitTeam) addPts(g, winT, chainNoQuieroVal(g), 'Envido (al mazo)');
+    else if (g.trick === 0) addPts(g, winT, 1, 'Envido (al mazo)');
+    g.env.done = true; g.env.waitTeam = null;
+  }
+  if (g.status === 'finished') return;
+  finishHand(g, winT, g.tru.val, 'Se fueron al mazo');
+}
+function validDeck(d) {
+  if (!d || d.length !== 40) return false;
+  var seen = {}, full = makeDeck();
+  for (var i = 0; i < d.length; i++) { if (seen[d[i]]) return false; seen[d[i]] = 1; }
+  for (var j = 0; j < full.length; j++) if (!seen[full[j]]) return false;
+  return true;
+}
+function apply(prev, action) {
+  if (!prev || !action) return null;
+  var g = norm(clone(prev));
+  var type = action.type;
+  var seat = typeof action.seat === 'number' ? action.seat : -1;
+  if (type === 'RESET') {
+    if (g.status !== 'finished') return null;
+    g.status = 'playing'; g.winner = null;
+    g.scores = { A: 0, B: 0 }; g.handNum = 0;
+    var nm = (g.mano + 1) % g.n, hf0 = emptyHandFields(nm);
+    for (var k0 in hf0) g[k0] = hf0[k0]; g = norm(g);
+    log(g, -1, '🔄 ¡Revancha!'); return g;
+  }
+  if (g.status !== 'playing') return null;
+  if (type === 'NEXT') {
+    if (!g.handOver) return null;
+    g.handNum++;
+    var nm2 = (g.mano + 1) % g.n, hf = emptyHandFields(nm2);
+    for (var k1 in hf) g[k1] = hf[k1]; return norm(g);
+  }
+  if (type === 'DEAL') {
+    if (g.dealt || g.handOver) return null;
+    if (!validDeck(action.deck)) return null;
+    for (var i = 0; i < g.n; i++) {
+      var h = action.deck.slice(i * 3, i * 3 + 3);
+      g.hands['s' + i] = h.slice(); g.initHands['s' + i] = h.slice();
+    }
+    g.dealt = true; g.turn = g.mano; g.leader = g.mano;
+    log(g, -1, 'Mano ' + (g.handNum + 1) + ' — es mano ' + g.seats[g.mano].name); return g;
+  }
+  if (seat < 0 || seat >= g.n) return null;
+  if (!g.dealt || g.handOver) return null;
+  var team = teamOf(g, seat);
+  if (type === 'MAZO') {
+    if (g.folded['s' + seat]) return null;
+    g.folded['s' + seat] = true;
+    log(g, seat, 'Me voy al mazo 🚪');
+    var alive = false, act = activeSeats(g);
+    for (var a1 = 0; a1 < act.length; a1++) if (teamOf(g, act[a1]) === team) { alive = true; break; }
+    if (!alive) { teamFoldEnd(g, team); return g; }
+    if (!anyWait(g)) stepTurn(g); return g;
+  }
+  if (g.folded['s' + seat]) return null;
+  if (g.flor.waitTeam) {
+    if (team !== g.flor.waitTeam) return null;
+    if (!cantaOK(g, seat)) return null;
+    var lvl = g.flor.lvl;
+    if (type === 'QUIERO') {
+      if (lvl === 1) return null;
+      var cmp = bestFlorTeamCompare(g), p2 = lvl === 2 ? 6 : faltaVal(g);
+      log(g, seat, 'Quiero'); g.flor.state = 'done'; g.flor.waitTeam = null;
+      addPts(g, cmp.team, p2, lvl === 2 ? 'Contraflor' : 'Contraflor al resto');
+      restoreHeldTruco(g); return g;
+    }
+    if (type === 'NO_QUIERO' || type === 'ACHICO') { log(g, seat, lvl === 1 ? 'Con flor me achico' : 'No quiero'); florNoQuiero(g, team); return g; }
+    if (type === 'CONTRAFLOR') {
+      if (lvl !== 1) return null;
+      if (!isFlor(g.initHands['s' + seat])) return null;
+      log(g, seat, '¡CONTRAFLOR!'); g.flor.lvl = 2; g.flor.raiser = team; g.flor.waitTeam = other(team); return g;
+    }
+    if (type === 'RESTO') {
+      if (lvl >= 3) return null;
+      if (lvl === 1 && !isFlor(g.initHands['s' + seat])) return null;
+      log(g, seat, '¡CONTRAFLOR AL RESTO!'); g.flor.lvl = 3; g.flor.raiser = team; g.flor.waitTeam = other(team); return g;
+    }
+    return null;
+  }
+  if (type === 'FLOR') {
+    if (!g.config.flor) return null;
+    if (g.trick !== 0) return null;
+    if (!isFlor(g.initHands['s' + seat])) return null;
+    if (g.flor.decl['s' + seat]) return null;
+    if (g.flor.state === 'pending') return null;
+    if (!cantaOK(g, seat)) return null;
+    if (g.tru.waitTeam && team !== g.tru.waitTeam) return null;
+    if (g.tru.waitTeam) { g.tru.heldWait = g.tru.waitTeam; g.tru.waitTeam = null; }
+    killEnvidoByFlor(g);
+    g.flor.decl['s' + seat] = true;
+    log(g, seat, '¡FLOR! 🌸');
+    if (g.flor.state === 'done') { addPts(g, team, 3, 'Flor'); restoreHeldTruco(g); return g; }
+    var oppHasFlor = false, act2 = activeSeats(g);
+    for (var f = 0; f < act2.length; f++) {
+      var s2 = act2[f];
+      if (teamOf(g, s2) !== team && isFlor(g.initHands['s' + s2])) { oppHasFlor = true; break; }
+    }
+    if (!oppHasFlor) { g.flor.state = 'done'; addPts(g, team, 3, 'Flor'); restoreHeldTruco(g); }
+    else { g.flor.state = 'pending'; g.flor.lvl = 1; g.flor.by = team; g.flor.waitTeam = other(team); }
+    return g;
+  }
+  if (type === 'ENVIDO' || type === 'REAL' || type === 'FALTA') {
+    if (g.trick !== 0) return null;
+    if (g.env.done) return null;
+    if (florAny(g)) return null;
+    if (!cantaOK(g, seat)) return null;
+    var tch = type === 'ENVIDO' ? 'E' : type === 'REAL' ? 'R' : 'F';
+    if (g.tru.waitTeam) {
+      if (team !== g.tru.waitTeam) return null;
+      if (g.env.chain.length) return null;
+      g.tru.heldWait = g.tru.waitTeam; g.tru.waitTeam = null;
+    } else if (g.env.waitTeam) {
+      if (team !== g.env.waitTeam) return null;
+    } else {
+      if (g.env.chain.length) return null;
+      if (g.played.t0['s' + seat] != null) return null;
+    }
+    var cE = 0, cR = 0, cF = 0;
+    for (var c1 = 0; c1 < g.env.chain.length; c1++) {
+      var t1 = g.env.chain[c1].t;
+      if (t1 === 'E') cE++; else if (t1 === 'R') cR++; else cF++;
+    }
+    if (tch === 'E' && (cR || cF || cE >= 4)) return null;
+    if (tch === 'R' && (cF || cR >= 2)) return null;
+    if (tch === 'F' && cF) return null;
+    g.env.chain.push({ t: tch, team: team });
+    g.env.waitTeam = other(team);
+    log(g, seat, tch === 'E' ? '¡ENVIDO!' : tch === 'R' ? '¡REAL ENVIDO!' : '¡FALTA ENVIDO!');
+    return g;
+  }
+  if (type === 'TRUCO') {
+    if (g.env.waitTeam) return null;
+    var base = g.tru.waitTeam ? g.tru.offerVal : g.tru.val;
+    var nv = base + 1;
+    if (nv > 4) return null;
+    if (g.tru.waitTeam) {
+      if (team !== g.tru.waitTeam) return null;
+      g.tru.val = g.tru.offerVal; g.tru.lastRaiser = g.tru.offBy;
+    } else {
+      if (g.turn !== seat) return null;
+      if (g.tru.lastRaiser === team) return null;
+    }
+    g.tru.offerVal = nv; g.tru.offBy = team; g.tru.waitTeam = other(team);
+    log(g, seat, nv === 2 ? '¡TRUCO!' : nv === 3 ? '¡RETRUCO!' : '¡VALE CUATRO!'); return g;
+  }
+  if (type === 'QUIERO' || type === 'NO_QUIERO') {
+    if (g.env.waitTeam) {
+      if (team !== g.env.waitTeam) return null;
+      if (!cantaOK(g, seat)) return null;
+      log(g, seat, type === 'QUIERO' ? 'Quiero' : 'No quiero');
+      if (type === 'QUIERO') resolveEnvidoQuiero(g); else envidoNoQuiero(g, team);
+      return g;
+    }
+    if (g.tru.waitTeam) {
+      if (team !== g.tru.waitTeam) return null;
+      log(g, seat, type === 'QUIERO' ? 'Quiero' : 'No quiero');
+      if (type === 'QUIERO') {
+        g.tru.val = g.tru.offerVal; g.tru.lastRaiser = g.tru.offBy;
+        g.tru.offerVal = null; g.tru.offBy = null; g.tru.waitTeam = null;
+      } else {
+        var winT2 = other(team), pv = g.tru.val;
+        g.tru.waitTeam = null; g.tru.offerVal = null;
+        finishHand(g, winT2, pv, 'Truco no querido');
+      }
+      return g;
+    }
+    return null;
+  }
+  if (type === 'PLAY') {
+    if (anyWait(g)) return null;
+    if (g.turn !== seat) return null;
+    var hand = g.hands['s' + seat];
+    var idx = hand.indexOf(action.card);
+    if (idx < 0) return null;
+    hand.splice(idx, 1);
+    g.played['t' + g.trick]['s' + seat] = action.card;
+    stepTurn(g); return g;
+  }
+  return null;
+}
+function can(g, action) { return apply(g, action) !== null; }
+function trucoLabel(g) {
+  var base = g.tru.waitTeam ? g.tru.offerVal : g.tru.val, nv = base + 1;
+  var name = nv === 2 ? 'TRUCO' : nv === 3 ? 'RETRUCO' : 'VALE CUATRO';
+  return g.tru.waitTeam ? 'QUIERO ' + name : name;
+}
+function actionsFor(gRaw, seat) {
+  var g = norm(clone(gRaw)), out = [];
+  function add(type, label, style, extra) {
+    var a = { type: type, seat: seat };
+    if (extra) for (var k in extra) a[k] = extra[k];
+    if (can(g, a)) out.push({ action: a, label: label, style: style || 'plain' });
+  }
+  if (g.status === 'finished') { add('RESET', 'REVANCHA', 'go'); return out; }
+  if (g.handOver) { add('NEXT', 'SIGUIENTE MANO ▶', 'go'); return out; }
+  if (!g.dealt) return out;
+  add('QUIERO', 'QUIERO', 'yes');
+  add('NO_QUIERO', 'NO QUIERO', 'no');
+  add('ACHICO', 'CON FLOR ME ACHICO', 'no');
+  add('ENVIDO', 'ENVIDO', 'env');
+  add('REAL', 'REAL ENVIDO', 'env');
+  add('FALTA', 'FALTA ENVIDO', 'env');
+  add('FLOR', 'FLOR 🌸', 'flor');
+  add('CONTRAFLOR', 'CONTRAFLOR', 'flor');
+  add('RESTO', 'CONTRAFLOR AL RESTO', 'flor');
+  add('TRUCO', trucoLabel(g), 'tru');
+  add('MAZO', 'IR AL MAZO', 'mazo');
+  return out;
+}
+function waitingText(g) {
+  g = norm(clone(g));
+  if (g.status === 'finished') return '';
+  if (g.handOver) return 'Mano terminada';
+  if (!g.dealt) return 'Repartiendo…';
+  var tn = function (t) { return t === 'A' ? 'Equipo 1' : 'Equipo 2'; };
+  if (g.flor.waitTeam) return 'Responde la flor: ' + tn(g.flor.waitTeam);
+  if (g.env.waitTeam) return 'Responde el envido: ' + tn(g.env.waitTeam);
+  if (g.tru.waitTeam) return 'Responde el truco: ' + tn(g.tru.waitTeam);
+  return 'Juega ' + g.seats[g.turn].name;
+}
+window.TRUCO = {SUITS,RANKS,SUIT_NAME,SUIT_SYM,makeDeck,rk,st,power,envidoOf,isFlor,florOf,newGame,norm,apply,actionsFor,activeSeats,orderFrom,pieOf,teamOf,other,faltaVal,waitingText,anyWait,validDeck};
+})();
 
-// ===== TEMA =====
-function setTheme(t) {
-  document.body.className = t === 'oscuro' ? '' : t;
-  document.querySelectorAll('.theme-btn').forEach((b,i) => {
-    b.classList.toggle('active', ['oscuro','calido','dia'][i] === t);
+</script>
+
+<!-- ===== FIREBASE CONFIG ===== -->
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAM_Bz9dQNqwkvySyH-8v_7TLMgSK1k78",
+  authDomain: "tutrucon.firebaseapp.com",
+  databaseURL: "https://tutrucon-default-rtdb.firebaseio.com",
+  projectId: "tutrucon",
+  storageBucket: "tutrucon.firebasestorage.app",
+  messagingSenderId: "113869288156",
+  appId: "1:113869288156:web:938b2eafdbe38994441659"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+</script>
+
+<!-- ===== APP ===== -->
+<script>
+// ───────────────────────────────────────────────
+// Estado local
+// ───────────────────────────────────────────────
+const T = window.TRUCO;
+let myPlayerId = null;   // uid local
+let mySeatIndex = null;  // 0..n-1
+let roomCode = null;
+let roomRef = null;
+let gameRef = null;
+let chatRef = null;
+let playersRef = null;
+let currentGame = null;
+let currentPlayers = null; // {uid: {name,seat,team}}
+let isHost = false;
+let chatOpen = false;
+let chatUnread = 0;
+let chatLocked = false;
+let myTeam = null;
+let lastLogLen = 0;
+
+function uid(){ return Math.random().toString(36).slice(2,10)+Date.now().toString(36); }
+function code4(){ return Math.random().toString(36).slice(2,6).toUpperCase(); }
+function suitClass(c){ return 'suit-'+T.st(c); }
+function cardHTML(c, extra){
+  const cls = extra||'';
+  return `<div class="card ${suitClass(c)} ${cls}"><div class="crank">${T.rk(c)}</div><div class="csuit">${T.SUIT_SYM[T.st(c)]}</div></div>`;
+}
+function faceDownHTML(extra){
+  return `<div class="card face-down ${extra||''}"></div>`;
+}
+
+// ───────────────────────────────────────────────
+// LOBBY
+// ───────────────────────────────────────────────
+let chosenPlayers = 2;
+document.querySelectorAll('.players-btn').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('.players-btn').forEach(x=>x.classList.remove('active-choice'));
+    b.classList.add('active-choice');
+    chosenPlayers = parseInt(b.dataset.v);
   });
-  localStorage.setItem('rr_tema', t);
-}
-const temaGuardado = localStorage.getItem('rr_tema') || 'oscuro';
-setTheme(temaGuardado);
-
-// ===== VEHICULO =====
-let vehiculo = 'moto';
-function setVehiculo(v, el) {
-  vehiculo = v;
-  document.querySelectorAll('.vtab').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById('moto-fields').style.display = v==='moto' ? '' : 'none';
-  document.getElementById('auto-fields').style.display = v==='auto' ? '' : 'none';
-  document.getElementById('bici-fields').style.display = v==='bici' ? '' : 'none';
-  const emojis = {moto:'🛵💰', bici:'🚲💰', auto:'🚗💰'};
-  document.getElementById('res-emojis').textContent = emojis[v];
-}
-
-// ===== DÍAS =====
-let diasSel = new Set([1,2,3,4,5]);
-document.querySelectorAll('.dia-btn').forEach(b => {
-  const d = parseInt(b.dataset.d);
-  b.addEventListener('click', () => {
-    diasSel.has(d) ? diasSel.delete(d) : diasSel.add(d);
-    b.classList.toggle('sel');
+});
+const activeStyle = 'background:var(--green);color:#0d1117;border-color:var(--green)';
+document.querySelector('[data-v="2"]').style=activeStyle;
+function showCreate(){ document.getElementById('join-box').style.display='none'; document.getElementById('create-box').style.display='flex'; }
+function showJoin(){ document.getElementById('create-box').style.display='none'; document.getElementById('join-box').style.display='flex'; }
+document.querySelectorAll('.players-btn').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('.players-btn').forEach(x=>{ x.style=''; x.classList.remove('active-choice'); });
+    b.style=activeStyle; b.classList.add('active-choice');
+    chosenPlayers=parseInt(b.dataset.v);
   });
 });
 
-// ===== ENCUESTA =====
-function selEnc(el, gid) {
-  document.getElementById(gid).querySelectorAll('.enc-btn').forEach(b => b.classList.remove('sel'));
-  el.classList.add('sel');
+document.getElementById('cr-btn').onclick = createRoom;
+document.getElementById('jo-btn').onclick = joinRoom;
+
+async function createRoom(){
+  const name = document.getElementById('cr-name').value.trim();
+  if(!name){ setErr('cr-err','Ingresá tu nombre'); return; }
+  myPlayerId = uid();
+  roomCode = code4();
+  isHost = true;
+  const config = {
+    players: chosenPlayers,
+    target: parseInt(document.getElementById('cr-target').value),
+    canta: document.getElementById('cr-canta').value,
+    flor: document.getElementById('cr-flor').checked,
+    chat: document.getElementById('cr-chat').checked
+  };
+  chatLocked = !config.chat;
+  roomRef = db.ref('mesas/'+roomCode);
+  const snap = await roomRef.once('value');
+  if(snap.exists()){ setErr('cr-err','Ese código ya existe, intentá de nuevo'); createRoom(); return; }
+  const playerData = { name, seat: 0, team:'A', online: true };
+  await roomRef.set({
+    config,
+    status: 'waiting',
+    host: myPlayerId,
+    players: { [myPlayerId]: playerData }
+  });
+  mySeatIndex = 0;
+  myTeam = 'A';
+  subscribeRoom();
+  showWaitingRoom();
 }
 
-// ===== CONSUMO POR CILINDRADA =====
-const CONSUMO = {110:2.8, 150:3.2, 200:4.0, 250:5.0};
-const DESGASTE = {moto:15, auto:25, bici:2}; // $/km
+async function joinRoom(){
+  const name = document.getElementById('jo-name').value.trim();
+  const code = document.getElementById('jo-code').value.trim().toUpperCase();
+  if(!name){ setErr('jo-err','Ingresá tu nombre'); return; }
+  if(!code||code.length<4){ setErr('jo-err','Código inválido'); return; }
+  myPlayerId = uid();
+  roomCode = code;
+  roomRef = db.ref('mesas/'+roomCode);
+  const snap = await roomRef.once('value');
+  if(!snap.exists()){ setErr('jo-err','Mesa no encontrada'); return; }
+  const data = snap.val();
+  if(data.status === 'playing'){ setErr('jo-err','La partida ya empezó'); return; }
+  const players = data.players||{};
+  const seats = Object.values(players).map(p=>p.seat);
+  const maxSeat = data.config.players - 1;
+  let nextSeat = 0;
+  while(seats.includes(nextSeat) && nextSeat <= maxSeat) nextSeat++;
+  if(nextSeat > maxSeat){ setErr('jo-err','Mesa llena'); return; }
+  const team = nextSeat%2===0?'A':'B';
+  mySeatIndex = nextSeat;
+  myTeam = team;
+  chatLocked = !data.config.chat;
+  await roomRef.child('players/'+myPlayerId).set({ name, seat: nextSeat, team, online:true });
+  isHost = data.host === myPlayerId;
+  subscribeRoom();
+  showWaitingRoom();
+}
 
-function fmt(n) { return '$' + Math.round(n).toLocaleString('es-AR'); }
+function subscribeRoom(){
+  gameRef = roomRef.child('game');
+  chatRef = roomRef.child('chat');
+  playersRef = roomRef.child('players');
 
-// ===== CALCULAR =====
-function calcular() {
-  const bruto = parseFloat(document.getElementById('bruto').value) || 0;
-  const horas = parseFloat(document.getElementById('horas').value) || 1;
-  const km    = parseFloat(document.getElementById('km').value) || 0;
-  const mono  = parseFloat(document.getElementById('monotributo').value) || 0;
-  const seg   = parseFloat(document.getElementById('seguro').value) || 0;
-  const zona  = document.getElementById('zona').value || 'CABA';
+  playersRef.on('value', snap=>{
+    currentPlayers = snap.val()||{};
+    updateWaitingRoom();
+  });
 
-  let costoNafta=0, datosDia=0, desgaste=0;
+  gameRef.on('value', snap=>{
+    const g = snap.val();
+    if(!g) return;
+    currentGame = T.norm(g);
+    if(currentGame.status==='playing'||currentGame.dealt||currentGame.handOver){
+      showGame();
+      renderGame();
+    }
+  });
 
-  if (vehiculo === 'moto') {
-    const nafta = parseFloat(document.getElementById('nafta').value) || 2000;
-    const datos = parseFloat(document.getElementById('datos').value) || 0;
-    const cil   = document.getElementById('cilindrada').value;
-    const litros = (km * (CONSUMO[cil]||3.2)) / 100;
-    costoNafta = litros * nafta;
-    datosDia   = datos / 30;
-    desgaste   = km * DESGASTE.moto;
-  } else if (vehiculo === 'auto') {
-    const nafta   = parseFloat(document.getElementById('nafta-auto').value) || 2000;
-    const consumo = parseFloat(document.getElementById('consumo-auto').value) || 10;
-    const datos   = parseFloat(document.getElementById('datos-auto').value) || 0;
-    const litros  = (km * consumo) / 100;
-    costoNafta = litros * nafta;
-    datosDia   = datos / 30;
-    desgaste   = km * DESGASTE.auto;
-  } else { // bici
-    const datos = parseFloat(document.getElementById('datos-bici').value) || 0;
-    datosDia = datos / 30;
-    desgaste = km * DESGASTE.bici;
+  roomRef.child('status').on('value', snap=>{
+    if(snap.val()==='playing') showGame();
+  });
+
+  chatRef && chatRef.limitToLast(60).on('value', snap=>{
+    renderChat(snap.val());
+  });
+}
+
+function showWaitingRoom(){
+  document.getElementById('lobby').style.display='none';
+  document.getElementById('waiting-room').style.display='flex';
+  document.getElementById('room-code').textContent = roomCode;
+}
+function showGame(){
+  document.getElementById('waiting-room').style.display='none';
+  document.getElementById('game').style.display='flex';
+  document.getElementById('game').style.flexDirection='column';
+  if(currentGame && currentGame.config.chat){
+    document.getElementById('chat-toggle').style.display='flex';
+    document.getElementById('chat-lock-icon').textContent = currentGame.config.chat ? '' : '🔒';
+  }
+}
+
+function updateWaitingRoom(){
+  if(!currentPlayers) return;
+  const config = currentGame ? currentGame.config : null;
+  let cfg = null;
+  roomRef.child('config').once('value',s=>{ cfg=s.val(); renderWR(cfg); });
+}
+function renderWR(cfg){
+  if(!cfg||!currentPlayers) return;
+  const n = cfg.players;
+  const seats = new Array(n).fill(null);
+  Object.entries(currentPlayers).forEach(([id,p])=>{ if(p.seat<n) seats[p.seat]=p; });
+  const grid = document.getElementById('wr-players');
+  grid.innerHTML = '';
+  for(let i=0;i<n;i++){
+    const p = seats[i];
+    const team = i%2===0?'A':'B';
+    const div = document.createElement('div');
+    div.className = 'player-slot'+(p?(' filled'+(p.seat===mySeatIndex?' mine':'')):'');
+    if(p){
+      div.innerHTML = `<div class="avatar">${team==='A'?'🔵':'🔴'}</div><div class="pname">${p.name}${p.seat===mySeatIndex?' (vos)':''}</div><div class="pteam ${team==='A'?'team-a':'team-b'}">Equipo ${team==='A'?'1':'2'}</div>`;
+    } else {
+      div.innerHTML = `<div class="avatar" style="opacity:.3">${team==='A'?'🔵':'🔴'}</div><div class="slot-empty">Esperando…</div><div class="pteam ${team==='A'?'team-a':'team-b'}">Equipo ${team==='A'?'1':'2'}</div>`;
+    }
+    grid.appendChild(div);
+  }
+  const filled = Object.values(currentPlayers).filter(p=>p.seat<n).length;
+  document.getElementById('wr-config').textContent =
+    `${n} jugadores · ${cfg.target} puntos · Flor: ${cfg.flor?'Sí':'No'} · Envido: ${cfg.canta==='pie'?'Solo el pie':'Cualquiera'} · Chat: ${cfg.chat?'💬 Abierto':'🔒 Cerrado'}`;
+  const startBtn = document.getElementById('start-btn');
+  const wrMsg = document.getElementById('wr-waiting-msg');
+  if(isHost){
+    if(filled===n){ startBtn.style.display='block'; wrMsg.textContent='¡Mesa completa! Podés empezar.'; }
+    else{ startBtn.style.display='none'; wrMsg.textContent=`Faltan ${n-filled} jugador(es)…`; }
+  } else {
+    startBtn.style.display='none';
+    wrMsg.textContent = filled===n ? 'Esperando que el host empiece…' : `Faltan ${n-filled} jugador(es)…`;
+  }
+  document.getElementById('start-btn').onclick = startGame;
+}
+
+async function startGame(){
+  // Construir juego inicial con los nombres
+  const cfgSnap = await roomRef.child('config').once('value');
+  const cfg = cfgSnap.val();
+  const pSnap = await roomRef.child('players').once('value');
+  const players = pSnap.val();
+  const names = new Array(cfg.players).fill('?');
+  Object.values(players).forEach(p=>{ if(p.seat<cfg.players) names[p.seat]=p.name; });
+  const g = T.newGame(cfg, names);
+  // Repartir
+  const deck = shuffleDeck();
+  const dealt = T.apply(g, {type:'DEAL', deck});
+  await gameRef.set(dealt);
+  await roomRef.child('status').set('playing');
+}
+
+function shuffleDeck(){
+  const d = T.makeDeck();
+  for(let i=d.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [d[i],d[j]]=[d[j],d[i]];
+  }
+  return d;
+}
+
+function leaveRoom(){
+  if(roomRef && myPlayerId) roomRef.child('players/'+myPlayerId+'/online').set(false);
+  roomRef && roomRef.off();
+  gameRef && gameRef.off();
+  chatRef && chatRef.off();
+  playersRef && playersRef.off();
+  location.reload();
+}
+
+// ───────────────────────────────────────────────
+// RENDER DEL JUEGO
+// ───────────────────────────────────────────────
+function seatIdxToUid(seat){
+  if(!currentPlayers) return null;
+  for(const [id,p] of Object.entries(currentPlayers)) if(p.seat===seat) return id;
+  return null;
+}
+function seatName(seat){
+  if(!currentGame) return 'J'+(seat+1);
+  return currentGame.seats[seat]?currentGame.seats[seat].name:'J'+(seat+1);
+}
+
+function renderGame(){
+  const g = currentGame;
+  if(!g) return;
+  const n = g.n;
+  const target = g.target;
+
+  // Scores
+  document.getElementById('score-a-val').textContent = g.scores.A;
+  document.getElementById('score-b-val').textContent = g.scores.B;
+  document.getElementById('score-a-name').textContent = 'Eq. 1';
+  document.getElementById('score-b-name').textContent = 'Eq. 2';
+  document.getElementById('bar-a').style.width = Math.min(100,g.scores.A/target*100)+'%';
+  document.getElementById('bar-b').style.width = Math.min(100,g.scores.B/target*100)+'%';
+  document.getElementById('g-target-lbl').textContent = 'a '+target;
+  document.getElementById('g-hand-info').textContent = 'Mano '+(g.handNum+1)+' · es mano: '+seatName(g.mano);
+
+  // Status banner
+  const banner = document.getElementById('status-banner');
+  banner.textContent = T.waitingText(g);
+  const isMyTurn = !T.anyWait(g) && g.turn===mySeatIndex && !g.handOver && g.dealt;
+  const hasWait = T.anyWait(g) && (
+    (g.env.waitTeam && g.env.waitTeam===myTeam) ||
+    (g.tru.waitTeam && g.tru.waitTeam===myTeam) ||
+    (g.flor.waitTeam && g.flor.waitTeam===myTeam)
+  );
+  if(isMyTurn||hasWait){ banner.style.borderColor='var(--green)'; banner.style.color='var(--green)'; }
+  else{ banner.style.borderColor='var(--border)'; banner.style.color='var(--text)'; }
+
+  // Armar asientos relativos: yo al fondo, rivales arriba, compas al costado
+  // orden visual: rivales (fila top) | centro | compañeros + mi mano
+  const allies = [], rivals = [];
+  for(let i=0;i<n;i++){
+    if(i===mySeatIndex) continue;
+    if(T.teamOf(g,i)===myTeam) allies.push(i);
+    else rivals.push(i);
   }
 
-  const monoDia  = mono / 30;
-  const segDia   = seg / 30;
-  const totalCostos = costoNafta + desgaste + datosDia + monoDia + segDia;
-  const neto     = bruto - totalCostos;
-  const gph      = neto / horas;
-  const diasSemana = diasSel.size || 5;
-  const proyMes  = neto * diasSemana * 4.3;
-  const proySem  = neto * diasSemana;
-  const proyUSD  = proyMes / USD;
-  const meta     = proyUSD >= 750;
+  // RIVALES
+  const rivalsRow = document.getElementById('rivals-row');
+  rivalsRow.innerHTML = '';
+  rivals.forEach(s=>{
+    const isFolded = !!g.folded['s'+s];
+    const hand = g.hands['s'+s]||[];
+    const isTurn = g.turn===s && !T.anyWait(g) && !g.handOver && g.dealt;
+    const div = document.createElement('div');
+    div.className = 'player-area';
+    let cardsHtml = hand.map(()=>faceDownHTML('small-rival')).join('');
+    // cartas jugadas en bazas actuales
+    let playedHtml = '';
+    for(let t=0;t<=g.trick;t++){
+      const c = g.played['t'+t]&&g.played['t'+t]['s'+s];
+      if(c) playedHtml += cardHTML(c,'played-on-table');
+    }
+    div.innerHTML = `
+      <div class="pname-small">${isTurn?'<span class="turn-indicator"></span>':''}${seatName(s)}${isFolded?'<span class="fold-badge">mazo</span>':''}</div>
+      <div class="hand">${cardsHtml}</div>
+      <div style="display:flex;gap:3px;margin-top:2px">${playedHtml}</div>`;
+    rivalsRow.appendChild(div);
+  });
 
-  // Resultado
-  const resCard = document.getElementById('res-card');
-  resCard.className = 'card ' + (gph >= 0 ? 'res-positivo' : 'res-negativo');
-  document.getElementById('res-gph').textContent = fmt(gph) + '/h';
-
-  // Desglose
-  let des = `
-    <div class="desglose-row"><span>Ganancia bruta</span><span>${fmt(bruto)}</span></div>`;
-  if (costoNafta > 0) {
-    const litros = vehiculo==='moto'
-      ? (km * (CONSUMO[document.getElementById('cilindrada').value]||3.2))/100
-      : (km * (parseFloat(document.getElementById('consumo-auto').value)||10))/100;
-    des += `<div class="desglose-row"><span>Combustible (${litros.toFixed(1)}L)</span><span class="neg">-${fmt(costoNafta)}</span></div>`;
+  // BAZAS CENTRALES (cartas jugadas por todos en la baza actual)
+  const bazasArea = document.getElementById('bazas-area');
+  bazasArea.innerHTML = '';
+  // Mostrar resultado de bazas anteriores + la actual
+  for(let t=0;t<=Math.min(g.trick,2);t++){
+    const res = g.results[t];
+    const pile = document.createElement('div');
+    pile.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:2px;';
+    const label = document.createElement('div');
+    label.style.cssText = 'font-size:.6rem;color:var(--muted);';
+    label.textContent = t<g.trick ? (res==='P'?'Parda':res==='A'?'Eq.1':'Eq.2') : 'Baza '+(t+1);
+    pile.appendChild(label);
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;gap:2px;';
+    // todas las cartas de esa baza
+    const allSeats = T.activeSeats(g);
+    for(let i=0;i<n;i++){
+      const c = g.played['t'+t]&&g.played['t'+t]['s'+i];
+      if(c) row.appendChild(createCardEl(c,'played-on-table'));
+    }
+    pile.appendChild(row);
+    bazasArea.appendChild(pile);
   }
-  des += `<div class="desglose-row"><span>Desgaste vehículo</span><span class="neg">-${fmt(desgaste)}</span></div>`;
-  if (datosDia>0) des += `<div class="desglose-row"><span>Datos móviles (día)</span><span class="neg">-${fmt(datosDia)}</span></div>`;
-  if (monoDia>0)  des += `<div class="desglose-row"><span>Monotributo (día)</span><span class="neg">-${fmt(monoDia)}</span></div>`;
-  if (segDia>0)   des += `<div class="desglose-row"><span>Seguro (día)</span><span class="neg">-${fmt(segDia)}</span></div>`;
-  des += `<div class="desglose-row"><span>Total costos</span><span class="neg">-${fmt(totalCostos)}</span></div>`;
-  des += `<div class="desglose-row"><span>🟢 Ganancia neta</span><span class="pos">${fmt(neto)}</span></div>`;
-  document.getElementById('desglose').innerHTML = des;
 
-  // Proyección
-  document.getElementById('proy-semana').textContent = fmt(proySem);
-  document.getElementById('proy-mes').textContent    = fmt(proyMes);
-  document.getElementById('proy-usd').textContent    = 'U$S ' + Math.round(proyUSD);
-  const metaEl = document.getElementById('proy-meta');
-  metaEl.textContent = meta ? '✅ SÍ' : `Faltán U$S ${Math.round(750-proyUSD)}`;
-  metaEl.className   = 'pn ' + (meta ? 'proy-meta-ok' : 'proy-meta-no');
+  // COMPAÑEROS (con cartas boca arriba — solo ves las de tu equipo)
+  const alliesRow = document.getElementById('allies-row');
+  alliesRow.innerHTML = '';
+  allies.forEach(s=>{
+    const isFolded = !!g.folded['s'+s];
+    const hand = g.hands['s'+s]||[];
+    const isTurn = g.turn===s && !T.anyWait(g) && !g.handOver && g.dealt;
+    const div = document.createElement('div');
+    div.className = 'player-area';
+    let cardsHtml = hand.map(c=>cardHTML(c,'ally-mini')).join('');
+    let playedHtml = '';
+    for(let t=0;t<=g.trick;t++){
+      const c = g.played['t'+t]&&g.played['t'+t]['s'+s];
+      if(c) playedHtml += cardHTML(c,'played-on-table');
+    }
+    div.innerHTML = `
+      <div class="pname-small">${isTurn?'<span class="turn-indicator"></span>':''}${seatName(s)}${isFolded?'<span class="fold-badge">mazo</span>':''}<br><small style="color:var(--green);font-size:.6rem">compañero</small></div>
+      <div class="hand">${cardsHtml}</div>
+      <div style="display:flex;gap:3px;margin-top:2px">${playedHtml}</div>`;
+    alliesRow.appendChild(div);
+  });
 
-  // Ranking zonas
-  const ZONAS = [
-    {zona:'Microcentro',gph:8200},{zona:'Palermo',gph:7400},{zona:'Belgrano',gph:6900},
-    {zona:'Caballito',gph:6200},{zona:'Almagro',gph:5800},{zona:'Flores',gph:5400},
-    {zona:'Lomas de Zamora',gph:5100},
-  ];
-  let lista = [...ZONAS];
-  const existe = lista.find(z => z.zona===zona);
-  if (!existe && zona && zona!=='Otra') lista.push({zona, gph: Math.round(gph)});
-  lista.sort((a,b) => b.gph - a.gph);
-  const maxGph = lista[0].gph;
-  document.getElementById('ranking-zonas').innerHTML = lista.map(z => {
-    const pct = Math.round((z.gph/maxGph)*100);
-    const tuZ = (z.zona===zona && !existe) ? ' 👈 vos' : (z.zona===zona ? ' 👈 vos' : '');
-    return `<div class="zona-row">
-      <span class="zona-name">${z.zona}${tuZ}</span>
-      <div class="zona-bar-w"><div class="zona-bar" style="width:${pct}%"></div></div>
-      <span class="zona-val">${fmt(z.gph)}/h</span>
-    </div>`;
-  }).join('');
-
-  // Historial
-  const entrada = {gph:Math.round(gph),neto:Math.round(neto),zona,vehiculo,fecha:new Date().toLocaleDateString('es-AR')};
-  let hist = JSON.parse(localStorage.getItem('rr_historial')||'[]');
-  hist.unshift(entrada);
-  if (hist.length>5) hist=hist.slice(0,5);
-  localStorage.setItem('rr_historial', JSON.stringify(hist));
-  renderHistorial();
-
-  // Guardar para WS
-  window._res = {gph:Math.round(gph),neto:Math.round(neto),zona,proyMes:Math.round(proyMes),proyUSD:Math.round(proyUSD)};
-
-  // Guardar en Supabase
-  guardarJornada({ganancia_bruta:bruto,horas_trabajadas:horas,nafta_precio:parseFloat(document.getElementById('nafta')?.value)||0,ganancia_neta:neto,ganancia_por_hora:gph,zona});
-
-  // Mostrar resultado
-  document.getElementById('formulario').style.display = 'none';
-  document.getElementById('resultado').style.display  = 'block';
-  window.scrollTo({top:0,behavior:'smooth'});
-
-  // Banner pub a los 30s
-  setTimeout(() => { document.getElementById('banner-pub').style.display='block'; }, 30000);
-}
-
-// ===== HISTORIAL =====
-function renderHistorial() {
-  const hist = JSON.parse(localStorage.getItem('rr_historial')||'[]');
-  const el   = document.getElementById('historial');
-  if (!hist.length) { el.innerHTML='<div class="txt-muted txt-center">Todavía no hay jornadas guardadas</div>'; return; }
-  el.innerHTML = hist.map(h => `
-    <div class="hist-item">
-      <div>
-        <div class="hist-meta">${h.fecha} · ${h.vehiculo||'🛵'} · ${h.zona||'CABA'}</div>
-        <div class="hist-gph">${fmt(h.gph)}/h</div>
-      </div>
-      <div style="text-align:right">
-        <div class="hist-meta">neto día</div>
-        <div style="color:var(--accent);font-weight:800">${fmt(h.neto)}</div>
-      </div>
-    </div>`).join('');
-}
-
-// ===== COMPARTIR WS =====
-function compartirWS() {
-  const r = window._res; if (!r) return;
-  const txt = `🛵 *RepartoReal — SIN CHUKUS*\n\nHoy en ${r.zona||'CABA'} me quedaron *${fmt(r.gph)}/hora* después de nafta y desgaste.\n\nNeto del día: *${fmt(r.neto)}*\nProyección mensual: *${fmt(r.proyMes)}* (≈ U$S ${r.proyUSD})\n\nCalculá lo tuyo gratis → https://repartoreal.github.io/repartoreal`;
-  window.open('https://api.whatsapp.com/send?text='+encodeURIComponent(txt));
-}
-
-// ===== NUEVA JORNADA =====
-function nuevaJornada() {
-  document.querySelectorAll('input[type=number],input[type=email],input[type=tel],textarea').forEach(el=>el.value='');
-  document.querySelectorAll('select').forEach(el=>el.selectedIndex=0);
-  document.getElementById('resultado').style.display='none';
-  document.getElementById('formulario').style.display='block';
-  document.getElementById('banner-pub').style.display='none';
-  window.scrollTo({top:0,behavior:'smooth'});
-}
-
-// ===== COMUNIDAD =====
-function sumarme() {
-  const mail = document.getElementById('com-mail').value.trim();
-  const tel  = document.getElementById('com-tel').value.trim();
-  if (!mail && !tel) { alert('Dejá al menos un mail o teléfono 📬'); return; }
-  fetch(`${SB_URL}/rest/v1/comentarios`, {
-    method:'POST',
-    headers:{'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Prefer':'return=minimal'},
-    body: JSON.stringify({comentario:'[comunidad]', contacto: mail || tel})
-  }).catch(()=>{});
-  alert('¡Anotado! Te avisamos cuando hay novedades 🛵');
-  document.getElementById('com-mail').value='';
-  document.getElementById('com-tel').value='';
-}
-
-// ===== COMENTARIOS =====
-function enviarComentario() {
-  const txt = document.getElementById('txt-comentario').value.trim();
-  if (!txt) return;
-  fetch(`${SB_URL}/rest/v1/comentarios`, {
-    method:'POST',
-    headers:{'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Prefer':'return=minimal'},
-    body: JSON.stringify({comentario:txt})
-  }).catch(()=>{});
-  const item = document.createElement('div');
-  item.className = 'com-item';
-  item.innerHTML = `"${txt}"<div class="com-meta">Vos · ahora</div>`;
-  document.getElementById('com-list').prepend(item);
-  document.getElementById('txt-comentario').value='';
-}
-
-// ===== SUPABASE: GUARDAR JORNADA =====
-async function guardarJornada(data) {
-  try {
-    await fetch(`${SB_URL}/rest/v1/jornada`, {
-      method:'POST',
-      headers:{'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Prefer':'return=minimal'},
-      body: JSON.stringify(data)
+  // MI MANO
+  const myLabel = document.getElementById('my-label');
+  const myHand = document.getElementById('my-hand');
+  const iAmFolded = !!g.folded['s'+mySeatIndex];
+  const envidoVal = g.dealt ? T.envidoOf(g.initHands['s'+mySeatIndex]||[]) : 0;
+  const florHand = g.dealt && T.isFlor(g.initHands['s'+mySeatIndex]||[]);
+  myLabel.innerHTML = `Tu mano · Envido: <b style="color:var(--blue)">${g.dealt?envidoVal:'—'}</b>${florHand?` · <span style="color:var(--purple)">¡FLOR! 🌸</span>`:''}${iAmFolded?` · <span class="fold-badge" style="font-size:.8rem">fuiste al mazo</span>`:''}`;
+  myHand.innerHTML = '';
+  if(g.dealt && !iAmFolded){
+    const myCards = g.hands['s'+mySeatIndex]||[];
+    const canPlay = !T.anyWait(g) && g.turn===mySeatIndex && !g.handOver;
+    myCards.forEach(c=>{
+      const el = createCardEl(c, canPlay?'playable':'');
+      if(canPlay) el.addEventListener('click',()=>doPlay(c));
+      myHand.appendChild(el);
     });
-  } catch(e){}
-}
+    // cartas jugadas por mí
+    for(let t=0;t<=g.trick;t++){
+      const c = g.played['t'+t]&&g.played['t'+t]['s'+mySeatIndex];
+      if(c){
+        const el = createCardEl(c,'played-on-table');
+        myHand.appendChild(el);
+      }
+    }
+  }
 
-// ===== CONTADOR =====
-async function cargarContador() {
-  try {
-    const r = await fetch(`${SB_URL}/rest/v1/jornada?select=id&created_at=gte.${new Date().toISOString().slice(0,10)}`, {
-      headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Prefer':'count=exact','Range-Unit':'items','Range':'0-0'}
-    });
-    const count = parseInt(r.headers.get('content-range')?.split('/')[1]||'0');
-    const num = count < 50 ? (Math.floor(Math.random()*121)+80) : count;
-    document.getElementById('cnt').textContent = num;
-    document.getElementById('stat-cnt').textContent = num;
-  } catch(e) {
-    const num = Math.floor(Math.random()*121)+80;
-    document.getElementById('cnt').textContent = num;
-    document.getElementById('stat-cnt').textContent = num;
+  // ACCIONES
+  renderActions(g);
+
+  // LOG
+  renderLog(g);
+
+  // WIN OVERLAY
+  if(g.status==='finished'){
+    const ov = document.getElementById('win-overlay');
+    ov.style.display='flex';
+    const isWinner = g.winner===myTeam;
+    document.getElementById('win-icon').textContent = isWinner?'🏆':'😔';
+    const winName = g.winner==='A'?'Equipo 1':'Equipo 2';
+    document.getElementById('win-title').textContent = isWinner?`¡Ganaste con ${winName}!`:`Ganó ${winName}`;
+    document.getElementById('win-scores').textContent = g.scores.A+' — '+g.scores.B;
+  } else {
+    document.getElementById('win-overlay').style.display='none';
   }
 }
 
-// ===== INIT =====
-renderHistorial();
-cargarContador();
+function createCardEl(c, extra){
+  const div = document.createElement('div');
+  div.className = `card ${suitClass(c)} ${extra||''}`;
+  div.innerHTML = `<div class="crank">${T.rk(c)}</div><div class="csuit">${T.SUIT_SYM[T.st(c)]}</div>`;
+  return div;
+}
+
+function renderActions(g){
+  const bar = document.getElementById('actions-bar');
+  bar.innerHTML = '';
+  if(!g.dealt && !g.handOver) return;
+  const acts = T.actionsFor(g, mySeatIndex);
+  if(acts.length===0){
+    bar.innerHTML = '<span style="color:var(--muted);font-size:.85rem;padding:.5rem">Esperá tu turno…</span>';
+    return;
+  }
+  acts.forEach(({action,label,style})=>{
+    const btn = document.createElement('button');
+    btn.className = 'act-btn '+style;
+    btn.textContent = label;
+    btn.addEventListener('click',()=>doAction(action));
+    bar.appendChild(btn);
+  });
+}
+
+function renderLog(g){
+  if(!g.log) return;
+  const logEl = document.getElementById('game-log');
+  if(g.log.length===lastLogLen) return;
+  lastLogLen = g.log.length;
+  logEl.innerHTML = '';
+  // mostrar últimas 15 entradas
+  const entries = g.log.slice(-15);
+  entries.forEach(e=>{
+    const div = document.createElement('div');
+    div.className = 'log-entry'+(e.s===-1?' highlight':'');
+    const name = e.s===-1?'':seatName(e.s)+': ';
+    div.textContent = name+e.x;
+    logEl.appendChild(div);
+  });
+  logEl.scrollTop = logEl.scrollHeight;
+}
+
+// ───────────────────────────────────────────────
+// ACCIONES → Firebase
+// ───────────────────────────────────────────────
+async function doAction(action){
+  if(!currentGame||!gameRef) return;
+  const next = T.apply(currentGame, action);
+  if(!next){ console.warn('Acción inválida',action); return; }
+  // Si la mano terminó y es NEXT, repartir también
+  if(action.type==='NEXT'){
+    const deck = shuffleDeck();
+    const dealt = T.apply(next, {type:'DEAL', deck});
+    await gameRef.set(dealt||next);
+  } else {
+    await gameRef.set(next);
+  }
+}
+function doPlay(card){ doAction({type:'PLAY',seat:mySeatIndex,card}); }
+function doReset(){
+  document.getElementById('win-overlay').style.display='none';
+  if(!currentGame||!gameRef) return;
+  const next = T.apply(currentGame,{type:'RESET',seat:mySeatIndex});
+  if(!next) return;
+  const deck = shuffleDeck();
+  const dealt = T.apply(next,{type:'DEAL',deck});
+  gameRef.set(dealt||next);
+}
+
+// ───────────────────────────────────────────────
+// CHAT
+// ───────────────────────────────────────────────
+function toggleChat(){
+  chatOpen = !chatOpen;
+  document.getElementById('chat-panel').classList.toggle('open',chatOpen);
+  if(chatOpen){ chatUnread=0; updateChatBadge(); }
+}
+function updateChatBadge(){
+  const badge = document.getElementById('chat-badge');
+  badge.textContent = chatUnread;
+  badge.style.display = chatUnread>0?'flex':'none';
+}
+function sendChat(){
+  if(!chatRef||chatLocked) return;
+  const inp = document.getElementById('chat-input');
+  const txt = inp.value.trim();
+  if(!txt) return;
+  inp.value = '';
+  const myName = currentGame&&currentGame.seats[mySeatIndex]?currentGame.seats[mySeatIndex].name:'Vos';
+  chatRef.push({ name: myName, text: txt, t: Date.now() });
+}
+function renderChat(data){
+  const container = document.getElementById('chat-msgs');
+  container.innerHTML = '';
+  if(!data) return;
+  const msgs = Object.values(data).sort((a,b)=>a.t-b.t);
+  msgs.forEach(m=>{
+    const div = document.createElement('div');
+    div.className = 'chat-msg';
+    div.innerHTML = `<span class="cm-name">${m.name}: </span><span class="cm-text">${m.text}</span>`;
+    container.appendChild(div);
+  });
+  container.scrollTop = container.scrollHeight;
+  if(!chatOpen){ chatUnread++; updateChatBadge(); }
+}
+
+// ───────────────────────────────────────────────
+// UTILS
+// ───────────────────────────────────────────────
+function setErr(id,msg){ document.getElementById(id).textContent=msg; setTimeout(()=>document.getElementById(id).textContent='',3000); }
 </script>
 </body>
 </html>
